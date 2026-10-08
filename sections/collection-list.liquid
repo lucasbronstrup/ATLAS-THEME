@@ -3,7 +3,7 @@
   <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
 {% endif %}
 {% assign placeholder_title = 'general.collection' | t %}
-<section class="section{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'catalog.collections.carousel_position' | t: current: '{current}', total: '{total}' | escape }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
+<section class="section{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'catalog.collections.carousel_position' | t: current: '__current__', total: '__total__' | escape }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
   <div class="container">
     <div class="section-heading">
       <div>

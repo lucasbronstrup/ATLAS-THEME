@@ -2,7 +2,7 @@
   {{ 'product-carousel.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
 {% endif %}
-<section class="section collection-page{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'products.carousel.position' | t: current: '{current}', total: '{total}' | escape }}"{% endif %} style="--grid-desktop: {{ section.settings.columns }}; --grid-mobile: {{ section.settings.mobile_columns }}; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
+<section class="section collection-page{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'products.carousel.position' | t: current: '__current__', total: '__total__' | escape }}"{% endif %} style="--grid-desktop: {{ section.settings.columns }}; --grid-mobile: {{ section.settings.mobile_columns }}; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
   <div class="container">
     <div class="collection-header{% if section.settings.show_image and collection.image %} collection-header--image{% endif %}">
       <div><h1 class="section-heading" id="CollectionHeading-{{ section.id }}">{{ collection.title | escape }}</h1>{% if section.settings.show_description and collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>

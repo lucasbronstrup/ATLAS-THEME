@@ -27,7 +27,7 @@
         const cards = [...track.children];
         const step = cards.length > 1 ? Math.abs(cards[1].offsetLeft - cards[0].offsetLeft) : track.clientWidth;
         const index = Math.min(cards.length, Math.floor((current + 2) / Math.max(1, step)) + 1);
-        status.textContent = (element.dataset.carouselStatusFormat || '{current} / {total}').replace('{current}', String(cards.length ? index : 0)).replace('{total}', String(cards.length));
+        status.textContent = (element.dataset.carouselStatusFormat || '{current} / {total}').replace(/\{current\}|__current__/, String(cards.length ? index : 0)).replace(/\{total\}|__total__/, String(cards.length));
       }
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
