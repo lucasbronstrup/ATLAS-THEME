@@ -3,7 +3,7 @@
   <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
 {% endif %}
 {% assign placeholder_title = 'general.collection' | t %}
-<section class="section{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'catalog.collections.carousel_position' | t: current: '__current__', total: '__total__' | escape }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
+<section class="section{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'catalog.collections.carousel_position' | t: current: '__current__', total: '__total__' }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
   <div class="container">
     <div class="section-heading">
       <div>
@@ -23,14 +23,14 @@
     </div>
     <div class="{% if section.settings.layout == 'carousel' %}atlas-carousel-track collection-list-carousel{% else %}collection-grid{% endif %} collection-grid--{{ section.settings.card_style }}" style="--columns:{{ section.settings.columns }};--mobile-columns:{{ section.settings.mobile_columns }}" {% if section.settings.layout == 'carousel' %}id="CollectionListTrack-{{ section.id }}" data-carousel-track tabindex="0" role="region" aria-labelledby="CollectionListHeading-{{ section.id }}"{% endif %}>
       {% for block in section.blocks %}
-        {% assign collection = block.settings.collection %}
+        {% assign block_collection = block.settings.collection %}
         {% if section.settings.layout == 'carousel' %}<div class="atlas-carousel-cell">{% endif %}
-          <a class="collection-card" href="{{ block.settings.link | default: collection.url | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+          <a class="collection-card" href="{{ block.settings.link | default: block_collection.url | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
             <div class="collection-card-image">
-              {% assign image = block.settings.image | default: collection.featured_image %}
+              {% assign image = block.settings.image | default: block_collection.featured_image %}
               {% if image %}{{ image | image_url: width: 700 | image_tag: loading: 'lazy', widths: '200,400,700', sizes: '(min-width: 750px) 20vw, 75vw' }}{% else %}{% assign placeholder_index = forloop.index0 | modulo: 6 | plus: 1 %}{{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}{% endif %}
             </div>
-            <h3>{{ block.settings.heading | default: collection.title | default: placeholder_title | escape }} {% render 'icon', name: 'arrow' %}</h3>
+            <h3>{{ block.settings.heading | default: block_collection.title | default: placeholder_title | escape }} {% render 'icon', name: 'arrow' %}</h3>
             {% if block.settings.text != blank %}<p class="muted">{{ block.settings.text | escape }}</p>{% endif %}
           </a>
         {% if section.settings.layout == 'carousel' %}</div>{% endif %}
@@ -74,7 +74,16 @@
       "type": "select",
       "id": "layout",
       "label": "Exibição das coleções",
-      "options": [{"value":"grid","label":"Grade"},{"value":"carousel","label":"Carrossel"}],
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grade"
+        },
+        {
+          "value": "carousel",
+          "label": "Carrossel"
+        }
+      ],
       "default": "grid"
     },
     {
@@ -127,7 +136,20 @@
       "type": "select",
       "id": "carousel_mobile_columns",
       "label": "Coleções visíveis no carrossel no celular",
-      "options": [{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.5",
+          "label": "1,5"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
       "default": "1.5"
     },
     {
@@ -150,7 +172,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "range",
@@ -160,7 +183,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     }
   ],
   "blocks": [

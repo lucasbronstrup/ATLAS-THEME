@@ -92,7 +92,8 @@
         "show_author": false,
         "show_read_more": true,
         "show_view_all": true,
-        "link_label": "Ver todos os posts"
+        "link_label": "Ver todos os posts",
+        "blog": "news"
       }
     },
     "newsletter": {

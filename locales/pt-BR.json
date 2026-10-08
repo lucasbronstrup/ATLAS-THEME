@@ -42,7 +42,8 @@
     "search_articles": "Artigos",
     "search_pages": "Páginas",
     "explore": "Explore a loja",
-    "faq_empty": "Adicione perguntas e respostas pelo editor do tema."
+    "faq_empty": "Adicione perguntas e respostas pelo editor do tema.",
+    "countdown_empty": "Defina um prazo com fuso horário para exibir o contador."
   },
   "products": {
     "general": {
@@ -159,7 +160,7 @@
       "quantity_for": "Quantidade de {{ title }}",
       "remove_for": "Remover {{ title }}",
       "remove": "Remover",
-      "shipping_remaining": "Faltam {{ amount }} para alcançar o frete grátis.",
+      "shipping_remaining_html": "Faltam {{ amount }} para alcançar o frete grátis.",
       "shipping_reached": "Seu carrinho atingiu o valor mínimo para frete grátis.",
       "shipping_progress": "Progresso para frete grátis",
       "note": "Adicionar observação ao pedido",
@@ -254,7 +255,7 @@
       "expired": "Este cartão-presente expirou.",
       "disabled": "Este cartão-presente não está mais ativo.",
       "balance": "Saldo disponível:",
-      "expires": "Válido até {{ date }}",
+      "expires_html": "Válido até {{ date }}",
       "instructions": "Use este código no checkout para resgatar seu cartão-presente.",
       "code": "Código do cartão-presente",
       "copy": "Copiar código",
@@ -262,6 +263,14 @@
       "copy_manual": "Selecione e copie o código acima.",
       "wallet": "Adicionar à Apple Wallet",
       "print": "Imprimir cartão-presente"
+    }
+  },
+  "sections": {
+    "before_after": {
+      "before": "Antes",
+      "after": "Depois",
+      "slider_label": "Comparar as duas imagens",
+      "instructions": "Arraste o controle ou use as setas do teclado para comparar."
     }
   }
 }

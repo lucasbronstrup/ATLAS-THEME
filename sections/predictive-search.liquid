@@ -14,7 +14,7 @@
     {% if predictive_search.resources.pages.size > 0 or predictive_search.resources.articles.size > 0 %}
       <div class="predictive-results__group"><h3>{{ 'catalog.search.pages' | t }}</h3><ul role="list">{% for page in predictive_search.resources.pages %}<li><a href="{{ page.url }}">{{ page.title | escape }}</a></li>{% endfor %}{% for article in predictive_search.resources.articles %}<li><a href="{{ article.url }}">{{ article.title | escape }}</a></li>{% endfor %}</ul></div>
     {% endif %}
-    {% assign escaped_terms = predictive_search.terms | escape %}<a class="predictive-results__all" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&amp;options%5Bprefix%5D=last&amp;type=product,article,page">{{ 'catalog.search.all_results' | t: terms: escaped_terms }} →</a>
+    <a class="predictive-results__all" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&amp;options%5Bprefix%5D=last&amp;type=product,article,page">{{ 'catalog.search.all_results' | t: terms: predictive_search.terms }} →</a>
   </div>
 {% endif %}
 {% schema %}

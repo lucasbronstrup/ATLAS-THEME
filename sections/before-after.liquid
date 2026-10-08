@@ -1,14 +1,32 @@
 {{ 'visual-sections.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'before-after.js' | asset_url }}" defer></script>
-{% assign comparison_before_alt = section.settings.before_alt | default: section.settings.before_image.alt | default: section.settings.before_label %}{% assign comparison_after_alt = section.settings.after_alt | default: section.settings.after_image.alt | default: section.settings.after_label %}
+{%- liquid
+  assign ba_before_label = 'sections.before_after.before' | t
+  if section.settings.before_label != blank
+    assign ba_before_label = section.settings.before_label
+  endif
+  assign ba_after_label = 'sections.before_after.after' | t
+  if section.settings.after_label != blank
+    assign ba_after_label = section.settings.after_label
+  endif
+  assign ba_slider_label = 'sections.before_after.slider_label' | t
+  if section.settings.slider_label != blank
+    assign ba_slider_label = section.settings.slider_label
+  endif
+  assign ba_instructions = 'sections.before_after.instructions' | t
+  if section.settings.instructions != blank
+    assign ba_instructions = section.settings.instructions
+  endif
+-%}
+{% assign comparison_before_alt = section.settings.before_alt | default: section.settings.before_image.alt | default: ba_before_label %}{% assign comparison_after_alt = section.settings.after_alt | default: section.settings.after_image.alt | default: ba_after_label %}
 <div class="section atlas-visual-section" style="{% if section.settings.spacing > 0 %}--visual-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--visual-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}"><div class="container">{% if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.text != blank %}<div class="section-heading"><div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}{% if section.settings.heading != blank %}<h2>{{ section.settings.heading | escape }}</h2>{% endif %}{% if section.settings.text != blank %}<div class="rte muted">{{ section.settings.text }}</div>{% endif %}</div></div>{% endif %}
-  <div class="atlas-comparison atlas-visual-media" data-before-after data-before-label="{{ section.settings.before_label | escape }}" data-after-label="{{ section.settings.after_label | escape }}" style="--before-after-position:{{ section.settings.start_position }}%;--comparison-ratio:{{ section.settings.aspect_ratio }};--comparison-fit:{{ section.settings.image_fit }}">
+  <div class="atlas-comparison atlas-visual-media" data-before-after data-before-label="{{ ba_before_label | escape }}" data-after-label="{{ ba_after_label | escape }}" style="--before-after-position:{{ section.settings.start_position }}%;--comparison-ratio:{{ section.settings.aspect_ratio }};--comparison-fit:{{ section.settings.image_fit }}">
     <div class="atlas-comparison__image atlas-comparison__image--before">{% if section.settings.before_image %}{{ section.settings.before_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '400,700,1000,1400,2000', sizes: '(min-width: 1400px) 1360px, 100vw', alt: comparison_before_alt }}{% else %}{{ 'lifestyle-1' | placeholder_svg_tag: 'atlas-comparison__placeholder' }}{% endif %}</div>
     <div class="atlas-comparison__image atlas-comparison__image--after">{% if section.settings.after_image %}{{ section.settings.after_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '400,700,1000,1400,2000', sizes: '(min-width: 1400px) 1360px, 100vw', alt: comparison_after_alt }}{% else %}{{ 'lifestyle-2' | placeholder_svg_tag: 'atlas-comparison__placeholder' }}{% endif %}</div>
-    <span class="atlas-comparison__badge atlas-comparison__badge--before">{{ section.settings.before_label | escape }}</span><span class="atlas-comparison__badge atlas-comparison__badge--after">{{ section.settings.after_label | escape }}</span>
+    <span class="atlas-comparison__badge atlas-comparison__badge--before">{{ ba_before_label | escape }}</span><span class="atlas-comparison__badge atlas-comparison__badge--after">{{ ba_after_label | escape }}</span>
     <div class="atlas-comparison__divider" aria-hidden="true"><span>↔</span></div>
-    <label class="visually-hidden" for="Comparison-{{ section.id }}">{{ section.settings.slider_label | escape }}</label><input class="atlas-comparison__range" id="Comparison-{{ section.id }}" type="range" min="0" max="100" step="1" value="{{ section.settings.start_position }}" data-comparison-input aria-describedby="ComparisonHelp-{{ section.id }}">
-  </div><div class="atlas-comparison__caption"><p id="ComparisonHelp-{{ section.id }}" class="muted">{{ section.settings.instructions | escape }}</p><output for="Comparison-{{ section.id }}" data-comparison-output>{{ section.settings.start_position }}%</output></div>
+    <label class="visually-hidden" for="Comparison-{{ section.id }}">{{ ba_slider_label | escape }}</label><input class="atlas-comparison__range" id="Comparison-{{ section.id }}" type="range" min="0" max="100" step="1" value="{{ section.settings.start_position }}" data-comparison-input aria-describedby="ComparisonHelp-{{ section.id }}">
+  </div><div class="atlas-comparison__caption"><p id="ComparisonHelp-{{ section.id }}" class="muted">{{ ba_instructions | escape }}</p><output for="Comparison-{{ section.id }}" data-comparison-output>{{ section.settings.start_position }}%</output></div>
 </div></div>
 {% schema %}
 {
@@ -43,7 +61,8 @@
       "min": 0,
       "max": 120,
       "step": 4,
-      "default": 0
+      "default": 0,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "range",
@@ -52,7 +71,8 @@
       "min": 0,
       "max": 80,
       "step": 4,
-      "default": 0
+      "default": 0,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "color",

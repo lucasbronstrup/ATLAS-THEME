@@ -19,6 +19,6 @@
     {% if show_date or show_author %}<p class="article-card__meta muted">{% if show_date %}{{ article.published_at | time_tag: format: 'date' }}{% endif %}{% if show_author %}<span>{{ article.author | escape }}</span>{% endif %}</p>{% endif %}
     {% unless show_title == false %}{% if heading_level == 'h3' %}<h3 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>{% else %}<h2 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h2>{% endif %}{% endunless %}
     {% if show_excerpt and article.excerpt_or_content != blank %}<p class="muted">{{ article.excerpt_or_content | strip_html | truncate: excerpt_size }}</p>{% endif %}
-    {% unless show_read_more == false %}<a href="{{ article.url }}" class="text-link" aria-label="{{ 'secondary.blog.read_article' | t: title: article.title | escape }}">{{ 'secondary.read_more' | t }} <span aria-hidden="true">→</span></a>{% endunless %}
+    {% unless show_read_more == false %}<a href="{{ article.url }}" class="text-link" aria-label="{{ 'secondary.blog.read_article' | t: title: article.title }}">{{ 'secondary.read_more' | t }} <span aria-hidden="true">→</span></a>{% endunless %}
   </div>
 </article>

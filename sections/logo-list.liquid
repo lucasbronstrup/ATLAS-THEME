@@ -12,7 +12,7 @@
       "type": "text",
       "id": "heading",
       "label": "Título",
-      "default": "Uma seleção para você"
+      "default": "Marcas parceiras"
     },
     {
       "type": "richtext",
@@ -50,7 +50,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "range",
@@ -60,7 +61,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     }
   ],
   "blocks": [
@@ -76,7 +78,8 @@
         {
           "type": "text",
           "id": "name",
-          "label": "Nome"
+          "label": "Nome",
+          "default": "Nome da marca"
         },
         {
           "type": "url",
@@ -89,7 +92,21 @@
   "max_blocks": 12,
   "presets": [
     {
-      "name": "Marcas / logos"
+      "name": "Marcas / logos",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
     }
   ]
 }

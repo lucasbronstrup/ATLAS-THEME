@@ -3,7 +3,7 @@
   <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
 {% endif %}
 {%- liquid
-  assign source_blog = section.settings.blog
+  assign source_blog = section.settings.blog | default: blogs.news
   assign article_count = source_blog.articles.size | default: 0
   assign blog_url = section.settings.link | default: source_blog.url
   assign blog_link_label = section.settings.link_label
@@ -15,7 +15,7 @@
     assign heading_fallback = 'secondary.blog.title' | t
   endif
 -%}
-<div class="section featured-blog{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'secondary.blog.carousel_position' | t: current: '__current__', total: '__total__' | escape }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --blog-columns: {{ section.settings.columns }}; --blog-mobile-columns: {{ section.settings.mobile_columns }}; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}; --article-image-ratio: {{ section.settings.image_ratio }}" {% if article_count == 0 and request.design_mode == false %}hidden{% endif %}>
+<div class="section featured-blog{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'secondary.blog.carousel_position' | t: current: '__current__', total: '__total__' }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --blog-columns: {{ section.settings.columns }}; --blog-mobile-columns: {{ section.settings.mobile_columns }}; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}; --article-image-ratio: {{ section.settings.image_ratio }}" {% if article_count == 0 and request.design_mode == false %}hidden{% endif %}>
   <div class="container">
     <div class="section-heading">
       <div>
@@ -49,37 +49,236 @@
 </div>
 {% schema %}
 {
-  "name":"Blog em destaque",
-  "tag":"section",
-  "disabled_on":{"groups":["header","footer"]},
-  "settings":[
-    {"type":"text","id":"eyebrow","label":"Texto superior"},
-    {"type":"text","id":"heading","label":"Título","default":"Conteúdos para inspirar."},
-    {"type":"richtext","id":"text","label":"Descrição"},
-    {"type":"blog","id":"blog","label":"Blog"},
-    {"type":"range","id":"limit","label":"Quantidade de posts","min":1,"max":12,"step":1,"default":3},
-    {"type":"select","id":"layout","label":"Exibição dos posts","options":[{"value":"grid","label":"Grade"},{"value":"carousel","label":"Carrossel"}],"default":"grid"},
-    {"type":"range","id":"columns","label":"Posts visíveis no computador","min":2,"max":4,"step":1,"default":3},
-    {"type":"select","id":"mobile_columns","label":"Colunas da grade no celular","options":[{"value":"1","label":"1"},{"value":"2","label":"2"}],"default":"1"},
-    {"type":"select","id":"carousel_mobile_columns","label":"Posts visíveis no carrossel no celular","options":[{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],"default":"1.5"},
-    {"type":"header","content":"Cartões dos posts"},
-    {"type":"checkbox","id":"show_image","label":"Mostrar imagem","default":true},
-    {"type":"select","id":"image_ratio","label":"Proporção da imagem","options":[{"value":"1.5","label":"Paisagem"},{"value":"1","label":"Quadrado"},{"value":"0.8","label":"Retrato"}],"default":"1.5"},
-    {"type":"checkbox","id":"show_title","label":"Mostrar título do post","default":true},
-    {"type":"checkbox","id":"show_excerpt","label":"Mostrar resumo","default":true},
-    {"type":"range","id":"excerpt_length","label":"Comprimento do resumo","min":80,"max":240,"step":20,"default":160},
-    {"type":"checkbox","id":"show_date","label":"Mostrar data","default":true},
-    {"type":"checkbox","id":"show_author","label":"Mostrar autor","default":false},
-    {"type":"checkbox","id":"show_read_more","label":"Mostrar link para ler o post","default":true},
-    {"type":"header","content":"Link para o blog"},
-    {"type":"checkbox","id":"show_view_all","label":"Mostrar link para o blog","default":true},
-    {"type":"text","id":"link_label","label":"Texto do link","default":"Ver todos os posts"},
-    {"type":"url","id":"link","label":"Link personalizado (opcional)","info":"Vazio usa o endereço do blog selecionado."},
-    {"type":"color","id":"background","label":"Fundo","default":"#ffffff"},
-    {"type":"color","id":"text_color","label":"Texto","default":"#172229"},
-    {"type":"range","id":"padding_top","label":"Espaço superior","min":0,"max":120,"step":4,"default":48,"unit":"px"},
-    {"type":"range","id":"padding_bottom","label":"Espaço inferior","min":0,"max":120,"step":4,"default":48,"unit":"px"}
+  "name": "Blog em destaque",
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto superior"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Conteúdos para inspirar."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Quantidade de posts",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Exibição dos posts",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grade"
+        },
+        {
+          "value": "carousel",
+          "label": "Carrossel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Posts visíveis no computador",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Colunas da grade no celular",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "carousel_mobile_columns",
+      "label": "Posts visíveis no carrossel no celular",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.5",
+          "label": "1,5"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1.5"
+    },
+    {
+      "type": "header",
+      "content": "Cartões dos posts"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Mostrar imagem",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporção da imagem",
+      "options": [
+        {
+          "value": "1.5",
+          "label": "Paisagem"
+        },
+        {
+          "value": "1",
+          "label": "Quadrado"
+        },
+        {
+          "value": "0.8",
+          "label": "Retrato"
+        }
+      ],
+      "default": "1.5"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Mostrar título do post",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Mostrar resumo",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "excerpt_length",
+      "label": "Comprimento do resumo",
+      "min": 80,
+      "max": 240,
+      "step": 20,
+      "default": 160
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Mostrar data",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Mostrar autor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_more",
+      "label": "Mostrar link para ler o post",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Link para o blog"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Mostrar link para o blog",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Texto do link",
+      "default": "Ver todos os posts"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link personalizado (opcional)",
+      "info": "Vazio usa o endereço do blog selecionado."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto",
+      "default": "#172229"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaço superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaço inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    }
   ],
-  "presets":[{"name":"Blog em destaque"}]
+  "presets": [
+    {
+      "name": "Blog em destaque"
+    }
+  ]
 }
 {% endschema %}

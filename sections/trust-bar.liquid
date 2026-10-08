@@ -1,4 +1,4 @@
-<section class="section trust-section" style="--section-bg: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px"><div class="container trust-grid">{% for block in section.blocks %}<div class="trust-item" {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<div><h2>{{ block.settings.heading | escape }}</h2><p>{{ block.settings.text | escape }}</p></div></div>{% endfor %}</div></section>
+<section class="section trust-section" style="--section-bg: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px"><div class="container trust-grid">{% for block in section.blocks %}<div class="trust-item" {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<div>{% if block.settings.heading != blank %}<h2>{{ block.settings.heading | escape }}</h2>{% endif %}{% if block.settings.text != blank %}<p>{{ block.settings.text | escape }}</p>{% endif %}</div></div>{% endfor %}</div></section>
 {% schema %}
 {
   "name": "Benefícios e confiança",
@@ -23,7 +23,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "range",
@@ -33,7 +34,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     }
   ],
   "blocks": [

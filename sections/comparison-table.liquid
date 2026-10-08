@@ -1,8 +1,13 @@
 {% liquid
   assign brand_count = 0
+  assign filled_values = 0
   for block in section.blocks
     if block.settings.heading != blank or block.settings.image != blank or block.settings.values != blank
       assign brand_count = brand_count | plus: 1
+    endif
+    assign real_values = block.settings.values | remove: '—' | remove: '–' | remove: '-' | strip_newlines | strip
+    if real_values != blank
+      assign filled_values = filled_values | plus: 1
     endif
   endfor
   assign features = section.settings.features | newline_to_br | split: '<br />'
@@ -14,7 +19,7 @@
     endif
   endfor
 %}
-<section class="section brand-comparison" data-product-comparison style="--comparison-brand-count:{{ brand_count }};--section-bg:{{ section.settings.background }};--section-ink:{{ section.settings.text_color }};--pad-top:{{ section.settings.padding_top }}px;--pad-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.highlight_color != blank %}--comparison-highlight:{{ section.settings.highlight_color }};{% endif %}" {% if request.design_mode == false %}{% if brand_count == 0 or feature_count == 0 %}hidden{% endif %}{% endif %}>
+<section class="section brand-comparison" data-product-comparison style="--comparison-brand-count:{{ brand_count }};--section-bg:{{ section.settings.background }};--section-ink:{{ section.settings.text_color }};--pad-top:{{ section.settings.padding_top }}px;--pad-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.highlight_color != blank %}--comparison-highlight:{{ section.settings.highlight_color }};{% endif %}" {% if request.design_mode == false %}{% if brand_count == 0 or feature_count == 0 or filled_values == 0 %}hidden{% endif %}{% endif %}>
   <div class="container">
     <div class="section-heading"><div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}{% if section.settings.heading != blank %}<h2 id="ComparisonHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>{% endif %}{% if section.settings.text != blank %}<p class="muted">{{ section.settings.text | escape | newline_to_br }}</p>{% endif %}</div></div>
     {% if brand_count > 0 and feature_count > 0 %}
@@ -45,33 +50,143 @@
 </section>
 {% schema %}
 {
-  "name":"Comparação de marcas",
-  "settings":[
-    {"type":"paragraph","content":"Compare sua marca ou produto com concorrentes usando apenas dados reais e verificáveis. Todos os valores são manuais. Não há links ou consulta de preços a outras lojas."},
-    {"type":"text","id":"eyebrow","label":"Texto superior"},
-    {"type":"text","id":"heading","label":"Título","default":"Nossa marca e outras marcas"},
-    {"type":"textarea","id":"text","label":"Descrição sem links"},
-    {"type":"text","id":"feature_heading","label":"Título da primeira coluna","default":"Características"},
-    {"type":"textarea","id":"features","label":"Características (uma por linha)","default":"Qualidade\nEspecificações\nAtendimento","info":"Use a mesma ordem nos valores de cada coluna. Preço pode ser uma característica manual, se for informado e verificado por você."},
-    {"type":"color","id":"background","label":"Fundo","default":"#ffffff"},
-    {"type":"color","id":"text_color","label":"Texto","default":"#172229"},
-    {"type":"color","id":"highlight_color","label":"Fundo da coluna em destaque (vazio usa o tema)"},
-    {"type":"range","id":"padding_top","label":"Espaço superior","min":0,"max":120,"step":4,"default":48,"unit":"px"},
-    {"type":"range","id":"padding_bottom","label":"Espaço inferior","min":0,"max":120,"step":4,"default":48,"unit":"px"}
+  "name": "Comparação de marcas",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Compare sua marca ou produto com concorrentes usando apenas dados reais e verificáveis. Todos os valores são manuais. Não há links ou consulta de preços a outras lojas."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto superior"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Nossa marca e outras marcas"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Descrição sem links"
+    },
+    {
+      "type": "text",
+      "id": "feature_heading",
+      "label": "Título da primeira coluna",
+      "default": "Características"
+    },
+    {
+      "type": "textarea",
+      "id": "features",
+      "label": "Características (uma por linha)",
+      "default": "Qualidade\nEspecificações\nAtendimento",
+      "info": "Use a mesma ordem nos valores de cada coluna. Preço pode ser uma característica manual, se for informado e verificado por você."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto",
+      "default": "#172229"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Fundo da coluna em destaque (vazio usa o tema)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaço superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaço inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    }
   ],
-  "blocks":[{
-    "type":"brand",
-    "name":"Marca ou concorrente",
-    "settings":[
-      {"type":"text","id":"heading","label":"Nome da marca ou produto"},
-      {"type":"text","id":"label","label":"Legenda opcional"},
-      {"type":"image_picker","id":"image","label":"Logo ou imagem opcional"},
-      {"type":"text","id":"image_alt","label":"Descrição da imagem (opcional)"},
-      {"type":"checkbox","id":"highlight","label":"Destacar esta coluna","default":false},
-      {"type":"textarea","id":"values","label":"Valores (um por linha)","info":"Na mesma ordem das características. Vazio exibe —. Escreva apenas diferenças verificadas, sem promessas genéricas."}
-    ]
-  }],
-  "max_blocks":5,
-  "presets":[{"name":"Comparação de marcas","blocks":[{"type":"brand","settings":{"heading":"Nossa marca","highlight":true,"values":"—\n—\n—"}},{"type":"brand","settings":{"heading":"Outras marcas","values":"—\n—\n—"}}]}]
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Marca ou concorrente",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Nome da marca ou produto"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Legenda opcional"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo ou imagem opcional"
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Descrição da imagem (opcional)"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight",
+          "label": "Destacar esta coluna",
+          "default": false
+        },
+        {
+          "type": "textarea",
+          "id": "values",
+          "label": "Valores (um por linha)",
+          "info": "Na mesma ordem das características. Vazio exibe —. Escreva apenas diferenças verificadas, sem promessas genéricas."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    {
+      "name": "Comparação de marcas",
+      "blocks": [
+        {
+          "type": "brand",
+          "settings": {
+            "heading": "Nossa marca",
+            "highlight": true,
+            "values": "—\n—\n—"
+          }
+        },
+        {
+          "type": "brand",
+          "settings": {
+            "heading": "Outras marcas",
+            "values": "—\n—\n—"
+          }
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}

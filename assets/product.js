@@ -225,7 +225,7 @@
       if (!response.ok) return;
       const html = new DOMParser().parseFromString(await response.text(), 'text/html');
       const updated = html.querySelector('[data-product-recommendations]');
-      if (updated && !updated.hidden && updated.querySelector('.product-card')) {
+      if (updated && !updated.hidden && (updated.querySelector('.product-card') || window.Shopify?.designMode)) {
         recommendations.innerHTML = updated.innerHTML;
         recommendations.hidden = false;
         recommendations.dispatchEvent(new CustomEvent('atlas:products-rendered', { bubbles: true }));

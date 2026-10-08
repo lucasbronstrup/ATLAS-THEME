@@ -24,7 +24,7 @@
       assign media_aspect = 'auto'
   endcase
 -%}
-<div id="Product-{{ section.id }}" class="product-section" data-atlas-product data-section-id="{{ section.id }}" data-product-url="{{ product.url }}" data-variant-id="{{ current_variant.id }}" data-featured-media="{{ current_media.id }}" data-update-error="{{ 'products.general.update_error' | t | escape }}" style="--product-space: {{ section.settings.spacing }}px; --product-space-mobile: {{ section.settings.mobile_spacing }}px; --media-fit: {{ section.settings.image_fit }}; --media-aspect: {{ media_aspect }}; --product-bg: {{ section.settings.background | default: settings.color_background }}; --media-bg: {{ section.settings.media_background | default: settings.color_surface }}; --ink: {{ section.settings.text_color | default: settings.color_text }}; --muted: {{ section.settings.muted_color | default: settings.color_muted }}">
+<div id="Product-{{ section.id }}" class="product-section" data-atlas-product data-section-id="{{ section.id }}" data-product-url="{{ product.url }}" data-variant-id="{{ current_variant.id }}" data-featured-media="{{ current_media.id }}" data-update-error="{{ 'products.general.update_error' | t }}" style="--product-space: {{ section.settings.spacing }}px; --product-space-mobile: {{ section.settings.mobile_spacing }}px; --media-fit: {{ section.settings.image_fit }}; --media-aspect: {{ media_aspect }}; --product-bg: {{ section.settings.background | default: settings.color_background }}; --media-bg: {{ section.settings.media_background | default: settings.color_surface }}; --ink: {{ section.settings.text_color | default: settings.color_text }}; --muted: {{ section.settings.muted_color | default: settings.color_muted }}">
   <div class="container">
   <div class="product-layout product-layout--{{ section.settings.media_width }}">
     <div class="product-gallery" data-product-gallery aria-label="{{ 'products.general.media_gallery' | t }}">
@@ -154,7 +154,7 @@
               {% if pickup_locations.size > 0 %}<details><summary>{{ 'products.general.pickup_availability' | t }}</summary><ul>{% for availability in pickup_locations %}<li><strong>{{ availability.location.name | escape }}</strong><p>{% if availability.available %}{{ 'products.general.pickup_available' | t }} · {{ availability.pick_up_time }}{% else %}{{ 'products.general.pickup_unavailable' | t }}{% endif %}</p><div>{{ availability.location.address | format_address }}</div></li>{% endfor %}</ul></details>{% endif %}
             </div>
           {% when 'share' %}
-            <div class="product-block product-share" {{ block.shopify_attributes }}><button type="button" class="product-share__button" data-share-product data-share-url="{{ shop.url }}{{ product.url }}" data-share-title="{{ product.title | escape }}" data-share-success="{{ 'products.general.link_copied' | t | escape }}">{{ 'products.general.share' | t }} <span aria-hidden="true">↗</span></button><span class="muted" data-share-status role="status"></span><noscript><a href="mailto:?subject={{ product.title | url_encode }}&amp;body={{ shop.url | append: product.url | url_encode }}">{{ 'products.general.share' | t }}</a></noscript></div>
+            <div class="product-block product-share" {{ block.shopify_attributes }}><button type="button" class="product-share__button" data-share-product data-share-url="{{ shop.url }}{{ product.url }}" data-share-title="{{ product.title | escape }}" data-share-success="{{ 'products.general.link_copied' | t }}">{{ 'products.general.share' | t }} <span aria-hidden="true">↗</span></button><span class="muted" data-share-status role="status"></span><noscript><a href="mailto:?subject={{ product.title | url_encode }}&amp;body={{ shop.url | append: product.url | url_encode }}">{{ 'products.general.share' | t }}</a></noscript></div>
           {% when 'custom_liquid' %}
             <div class="product-block" {{ block.shopify_attributes }}>{{ block.settings.custom_liquid }}</div>
         {% endcase %}
@@ -173,37 +173,453 @@
 <script type="application/ld+json">{{ product | structured_data }}</script>
 {% schema %}
 {
-  "name":"Informações do produto",
-  "tag":"section",
-  "settings":[
-    {"type":"select","id":"media_width","label":"Largura da galeria","options":[{"value":"balanced","label":"Equilibrada"},{"value":"large","label":"Ampla"}],"default":"large"},
-    {"type":"select","id":"image_fit","label":"Ajuste da imagem","options":[{"value":"contain","label":"Mostrar inteira"},{"value":"cover","label":"Preencher"}],"default":"contain"},
-    {"type":"select","id":"media_ratio","label":"Proporção da galeria","options":[{"value":"square","label":"Quadrada"},{"value":"portrait","label":"Retrato"},{"value":"landscape","label":"Paisagem"},{"value":"adapt","label":"Original"}],"default":"square"},
-    {"type":"checkbox","id":"sticky_information","label":"Manter informações fixas ao rolar","default":true},
-    {"type":"checkbox","id":"sticky_add_to_cart","label":"Barra de compra fixa","default":true},
-    {"type":"range","id":"spacing","label":"Espaçamento vertical no computador","min":20,"max":100,"step":4,"default":40},
-    {"type":"range","id":"mobile_spacing","label":"Espaçamento vertical no celular","min":12,"max":80,"step":4,"default":24},
-    {"type":"color","id":"background","label":"Fundo (vazio usa o tema)"},
-    {"type":"color","id":"media_background","label":"Fundo da galeria (vazio usa o tema)"},
-    {"type":"color","id":"text_color","label":"Texto (vazio usa o tema)"},
-    {"type":"color","id":"muted_color","label":"Texto secundário (vazio usa o tema)"}
+  "name": "Informações do produto",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "media_width",
+      "label": "Largura da galeria",
+      "options": [
+        {
+          "value": "balanced",
+          "label": "Equilibrada"
+        },
+        {
+          "value": "large",
+          "label": "Ampla"
+        }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste da imagem",
+      "options": [
+        {
+          "value": "contain",
+          "label": "Mostrar inteira"
+        },
+        {
+          "value": "cover",
+          "label": "Preencher"
+        }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Proporção da galeria",
+      "options": [
+        {
+          "value": "square",
+          "label": "Quadrada"
+        },
+        {
+          "value": "portrait",
+          "label": "Retrato"
+        },
+        {
+          "value": "landscape",
+          "label": "Paisagem"
+        },
+        {
+          "value": "adapt",
+          "label": "Original"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_information",
+      "label": "Manter informações fixas ao rolar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_add_to_cart",
+      "label": "Barra de compra fixa",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Espaçamento vertical no computador",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "default": 40,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Espaçamento vertical no celular",
+      "min": 12,
+      "max": 80,
+      "step": 4,
+      "default": 24,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Fundo da galeria (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Texto secundário (vazio usa o tema)"
+    }
   ],
-  "blocks":[
-    {"type":"@app"},
-    {"type":"title","name":"Título","limit":1,"settings":[{"type":"checkbox","id":"show_vendor","label":"Mostrar fabricante","default":true}]},
-    {"type":"price","name":"Preço","limit":1,"settings":[{"type":"checkbox","id":"show_tax","label":"Mostrar informações de impostos e frete","default":true}]},
-    {"type":"variant_picker","name":"Seleção de variantes","limit":1,"settings":[{"type":"select","id":"picker_type","label":"Estilo","options":[{"value":"buttons","label":"Botões"},{"value":"images","label":"Imagens das variantes"},{"value":"dropdown","label":"Menu suspenso"}],"default":"buttons"},{"type":"text","id":"image_option_name","label":"Nome da opção com imagens","info":"Vazio usa a primeira opção. Usa a mídia real da variante; sem imagem, usa botão de texto."},{"type":"checkbox","id":"show_swatches","label":"Mostrar amostras nativas de cor e imagem","default":true}]},
-    {"type":"buy_buttons","name":"Botões de compra","limit":1,"settings":[{"type":"checkbox","id":"show_dynamic_checkout","label":"Mostrar checkout acelerado","default":true},{"type":"select","id":"button_style","label":"Estilo de Adicionar ao carrinho","options":[{"value":"accent","label":"Cor de destaque"},{"value":"solid","label":"Cor principal"},{"value":"outline","label":"Contorno"}],"default":"accent"},{"type":"checkbox","id":"show_payment_icons","label":"Mostrar meios de pagamento habilitados","default":true}]},
-    {"type":"guarantee","name":"Garantia horizontal","settings":[{"type":"paragraph","content":"Informe apenas garantias e condições reais da sua loja."},{"type":"text","id":"heading","label":"Título","default":"Garantia e atendimento"},{"type":"richtext","id":"text","label":"Texto","default":"<p>Consulte as condições e políticas da loja antes de comprar.</p>"},{"type":"select","id":"icon","label":"Ícone","options":[{"value":"shield","label":"Escudo"},{"value":"return","label":"Devolução"},{"value":"check","label":"Verificado"},{"value":"lock","label":"Cadeado"},{"value":"none","label":"Nenhum"}],"default":"shield"},{"type":"image_picker","id":"image","label":"Imagem personalizada"},{"type":"url","id":"link","label":"Link"},{"type":"text","id":"link_label","label":"Texto do link","default":"Ver condições"},{"type":"checkbox","id":"show_refund_policy","label":"Usar política de reembolso da loja quando não houver link","default":true},{"type":"color","id":"background","label":"Fundo (vazio usa o tema)"}]},
-    {"type":"secure_payment","name":"Pagamento seguro","limit":1,"settings":[{"type":"text","id":"heading","label":"Título","default":"Pagamento seguro"},{"type":"richtext","id":"text","label":"Texto","default":"<p>Finalize sua compra no checkout da Shopify. Confira os meios de pagamento disponíveis na finalização.</p>"},{"type":"checkbox","id":"show_payment_icons","label":"Mostrar meios de pagamento habilitados","default":true},{"type":"checkbox","id":"show_payment_terms","label":"Mostrar condições nativas do Shop Pay quando elegível","default":true}]},
-    {"type":"description","name":"Descrição","limit":1,"settings":[{"type":"checkbox","id":"collapsible","label":"Usar painel expansível","default":true},{"type":"text","id":"heading","label":"Título","default":"Detalhes do produto"},{"type":"checkbox","id":"open","label":"Abrir por padrão","default":true}]},
-    {"type":"accordion","name":"Painel expansível","settings":[{"type":"text","id":"heading","label":"Título","default":"Mais informações"},{"type":"richtext","id":"content","label":"Conteúdo"},{"type":"page","id":"page","label":"Página de conteúdo"},{"type":"checkbox","id":"open","label":"Abrir por padrão","default":false}]},
-    {"type":"text","name":"Texto","settings":[{"type":"richtext","id":"text","label":"Conteúdo"},{"type":"select","id":"style","label":"Estilo","options":[{"value":"plain","label":"Simples"},{"value":"note","label":"Destaque suave"}],"default":"plain"}]},
-    {"type":"sku","name":"Código SKU","limit":1},
-    {"type":"inventory","name":"Disponibilidade","limit":1,"settings":[{"type":"checkbox","id":"show_count","label":"Mostrar quantidade real de estoque","default":false}]},
-    {"type":"pickup","name":"Retirada na loja","limit":1},
-    {"type":"share","name":"Compartilhar","limit":1},
-    {"type":"custom_liquid","name":"Liquid personalizado","settings":[{"type":"liquid","id":"custom_liquid","label":"Código Liquid"}]}
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "title",
+      "name": "Título",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_vendor",
+          "label": "Mostrar fabricante",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "name": "Preço",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_tax",
+          "label": "Mostrar informações de impostos e frete",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "variant_picker",
+      "name": "Seleção de variantes",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "label": "Estilo",
+          "options": [
+            {
+              "value": "buttons",
+              "label": "Botões"
+            },
+            {
+              "value": "images",
+              "label": "Imagens das variantes"
+            },
+            {
+              "value": "dropdown",
+              "label": "Menu suspenso"
+            }
+          ],
+          "default": "buttons"
+        },
+        {
+          "type": "text",
+          "id": "image_option_name",
+          "label": "Nome da opção com imagens",
+          "info": "Vazio usa a primeira opção. Usa a mídia real da variante; sem imagem, usa botão de texto."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_swatches",
+          "label": "Mostrar amostras nativas de cor e imagem",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Botões de compra",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "label": "Mostrar checkout acelerado",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Estilo de Adicionar ao carrinho",
+          "options": [
+            {
+              "value": "accent",
+              "label": "Cor de destaque"
+            },
+            {
+              "value": "solid",
+              "label": "Cor principal"
+            },
+            {
+              "value": "outline",
+              "label": "Contorno"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_payment_icons",
+          "label": "Mostrar meios de pagamento habilitados",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "guarantee",
+      "name": "Garantia horizontal",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Informe apenas garantias e condições reais da sua loja."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Garantia e atendimento"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Consulte as condições e políticas da loja antes de comprar.</p>"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Ícone",
+          "options": [
+            {
+              "value": "shield",
+              "label": "Escudo"
+            },
+            {
+              "value": "return",
+              "label": "Devolução"
+            },
+            {
+              "value": "check",
+              "label": "Verificado"
+            },
+            {
+              "value": "lock",
+              "label": "Cadeado"
+            },
+            {
+              "value": "none",
+              "label": "Nenhum"
+            }
+          ],
+          "default": "shield"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem personalizada"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Texto do link",
+          "default": "Ver condições"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_refund_policy",
+          "label": "Usar política de reembolso da loja quando não houver link",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Fundo (vazio usa o tema)"
+        }
+      ]
+    },
+    {
+      "type": "secure_payment",
+      "name": "Pagamento seguro",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Pagamento seguro"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Finalize sua compra no checkout da Shopify. Confira os meios de pagamento disponíveis na finalização.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_payment_icons",
+          "label": "Mostrar meios de pagamento habilitados",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_payment_terms",
+          "label": "Mostrar condições nativas do Shop Pay quando elegível",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Descrição",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "collapsible",
+          "label": "Usar painel expansível",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Detalhes do produto"
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Abrir por padrão",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Painel expansível",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Mais informações"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Conteúdo"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Página de conteúdo"
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Abrir por padrão",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Texto",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Conteúdo"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Estilo",
+          "options": [
+            {
+              "value": "plain",
+              "label": "Simples"
+            },
+            {
+              "value": "note",
+              "label": "Destaque suave"
+            }
+          ],
+          "default": "plain"
+        }
+      ]
+    },
+    {
+      "type": "sku",
+      "name": "Código SKU",
+      "limit": 1
+    },
+    {
+      "type": "inventory",
+      "name": "Disponibilidade",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_count",
+          "label": "Mostrar quantidade real de estoque",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "pickup",
+      "name": "Retirada na loja",
+      "limit": 1
+    },
+    {
+      "type": "share",
+      "name": "Compartilhar",
+      "limit": 1
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Liquid personalizado",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Código Liquid"
+        }
+      ]
+    }
   ]
 }
 {% endschema %}

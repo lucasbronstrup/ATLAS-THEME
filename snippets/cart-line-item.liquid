@@ -22,9 +22,9 @@
     </div>
     {% if item.line_level_discount_allocations.size > 0 %}<ul class="cart-discounts" role="list">{% for allocation in item.line_level_discount_allocations %}<li>{{ allocation.discount_application.title | escape }} (−{{ allocation.amount | money }})</li>{% endfor %}</ul>{% endif %}
     <div class="cart-item__actions">
-      <label class="visually-hidden" for="Quantity-{{ context }}-{{ line_dom_id }}">{{ 'catalog.cart.quantity_for' | t: title: item.product.title | escape }}</label>
-      <input id="Quantity-{{ context }}-{{ line_dom_id }}" class="cart-item__quantity" type="number" name="updates[]" value="{{ item.quantity }}" min="{{ item.variant.quantity_rule.min | default: 1 }}" step="{{ item.variant.quantity_rule.increment | default: 1 }}" {% if item.variant.quantity_rule.max %}max="{{ item.variant.quantity_rule.max }}"{% endif %} inputmode="numeric" data-cart-change data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.quantity_for' | t: title: item.product.title | escape }}">
-      <a href="{{ item.url_to_remove }}" class="text-link cart-item__remove" data-remove-line="{{ item.key | escape }}" data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.remove_for' | t: title: item.product.title | escape }}">{{ 'catalog.cart.remove' | t }}</a>
+      <label class="visually-hidden" for="Quantity-{{ context }}-{{ line_dom_id }}">{{ 'catalog.cart.quantity_for' | t: title: item.product.title }}</label>
+      <input id="Quantity-{{ context }}-{{ line_dom_id }}" class="cart-item__quantity" type="number" name="updates[{{ item.key }}]" value="{{ item.quantity }}" min="{{ item.variant.quantity_rule.min | default: 1 }}" step="{{ item.variant.quantity_rule.increment | default: 1 }}" {% if item.variant.quantity_rule.max %}max="{{ item.variant.quantity_rule.max }}"{% endif %} inputmode="numeric" data-cart-change data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.quantity_for' | t: title: item.product.title }}">
+      <a href="{{ item.url_to_remove }}" class="text-link cart-item__remove" data-remove-line="{{ item.key | escape }}" data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.remove_for' | t: title: item.product.title }}">{{ 'catalog.cart.remove' | t }}</a>
     </div>
     {% if item.error_message != blank %}<p class="form-error" role="alert">{{ item.error_message | escape }}</p>{% endif %}
   </div>

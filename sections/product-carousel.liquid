@@ -19,7 +19,7 @@
     {%- if rendered_count >= section.settings.limit -%}{% break %}{%- endif -%}
   {%- endfor -%}
 {%- endcapture -%}
-<div class="section atlas-product-row" data-product-carousel data-carousel-status-format="{{ 'products.carousel.position' | t: current: '__current__', total: '__total__' | escape }}" style="--carousel-columns:{{ section.settings.columns }};--carousel-mobile-columns:{{ section.settings.mobile_columns }};{% if section.settings.spacing > 0 %}--row-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--row-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}" {% if rendered_count == 0 and request.design_mode == false %}hidden{% endif %}>
+<div class="section atlas-product-row" data-product-carousel data-carousel-status-format="{{ 'products.carousel.position' | t: current: '__current__', total: '__total__' }}" style="--carousel-columns:{{ section.settings.columns }};--carousel-mobile-columns:{{ section.settings.mobile_columns }};{% if section.settings.spacing > 0 %}--row-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--row-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}" {% if rendered_count == 0 and request.design_mode == false %}hidden{% endif %}>
   <div class="container">
     <div class="section-heading">
       <div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}<h2 id="CarouselHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2></div>
@@ -38,24 +38,123 @@
 </div>
 {% schema %}
 {
-  "name":"Carrossel de produtos",
-  "tag":"section",
-  "disabled_on":{"groups":["header","footer"]},
-  "settings":[
-    {"type":"text","id":"eyebrow","label":"Texto de apoio"},
-    {"type":"text","id":"heading","label":"Título","default":"Explore mais"},
-    {"type":"product_list","id":"products","label":"Produtos selecionados","limit":24,"info":"Se vazio, usa a coleção escolhida. Sem coleção, usa a coleção do produto ou o catálogo."},
-    {"type":"collection","id":"collection","label":"Coleção"},
-    {"type":"checkbox","id":"exclude_current","label":"Ocultar o produto da página atual","default":true},
-    {"type":"checkbox","id":"show_view_all","label":"Mostrar link para a coleção","default":true},
-    {"type":"range","id":"limit","label":"Quantidade de produtos","min":2,"max":20,"step":1,"default":8},
-    {"type":"range","id":"columns","label":"Produtos visíveis no computador","min":2,"max":6,"step":1,"default":4},
-    {"type":"select","id":"mobile_columns","label":"Produtos visíveis no celular","options":[{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],"default":"1.5"},
-    {"type":"range","id":"spacing","label":"Espaçamento no computador (0 usa o tema)","min":0,"max":120,"step":4,"default":0},
-    {"type":"range","id":"mobile_spacing","label":"Espaçamento no celular (0 usa o tema)","min":0,"max":80,"step":4,"default":0},
-    {"type":"color","id":"background","label":"Fundo (vazio usa o tema)"},
-    {"type":"color","id":"text_color","label":"Texto (vazio usa o tema)"}
+  "name": "Carrossel de produtos",
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto de apoio"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Explore mais"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Produtos selecionados",
+      "limit": 24,
+      "info": "Se vazio, usa a coleção escolhida. Sem coleção, usa a coleção do produto ou o catálogo."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Coleção"
+    },
+    {
+      "type": "checkbox",
+      "id": "exclude_current",
+      "label": "Ocultar o produto da página atual",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Mostrar link para a coleção",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Quantidade de produtos",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Produtos visíveis no computador",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Produtos visíveis no celular",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.5",
+          "label": "1,5"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1.5"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Espaçamento no computador (0 usa o tema)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 0,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Espaçamento no celular (0 usa o tema)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 0,
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto (vazio usa o tema)"
+    }
   ],
-  "presets":[{"name":"Carrossel de produtos"}]
+  "presets": [
+    {
+      "name": "Carrossel de produtos"
+    }
+  ]
 }
 {% endschema %}

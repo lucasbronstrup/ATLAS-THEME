@@ -42,7 +42,8 @@
     "search_articles": "Articles",
     "search_pages": "Pages",
     "explore": "Explore the store",
-    "faq_empty": "Add questions and answers in the theme editor."
+    "faq_empty": "Add questions and answers in the theme editor.",
+    "countdown_empty": "Set a deadline with time zone to show the countdown."
   },
   "products": {
     "general": {
@@ -159,7 +160,7 @@
       "quantity_for": "Quantity for {{ title }}",
       "remove_for": "Remove {{ title }}",
       "remove": "Remove",
-      "shipping_remaining": "You are {{ amount }} away from free shipping.",
+      "shipping_remaining_html": "You are {{ amount }} away from free shipping.",
       "shipping_reached": "Your cart has reached the free shipping threshold.",
       "shipping_progress": "Progress towards free shipping",
       "note": "Add an order note",
@@ -254,7 +255,7 @@
       "expired": "This gift card has expired.",
       "disabled": "This gift card is no longer active.",
       "balance": "Available balance:",
-      "expires": "Expires on {{ date }}",
+      "expires_html": "Expires on {{ date }}",
       "instructions": "Use this code at checkout to redeem your gift card.",
       "code": "Gift card code",
       "copy": "Copy code",
@@ -262,6 +263,14 @@
       "copy_manual": "Select and copy the code above.",
       "wallet": "Add to Apple Wallet",
       "print": "Print gift card"
+    }
+  },
+  "sections": {
+    "before_after": {
+      "before": "Before",
+      "after": "After",
+      "slider_label": "Compare the two images",
+      "instructions": "Drag the slider or use the arrow keys to compare."
     }
   }
 }

@@ -10,7 +10,7 @@
     </div>
     {% if search.performed %}
       {% paginate search.results by section.settings.results_per_page %}
-        {% assign escaped_terms = search.terms | escape %}<p class="catalog-count muted">{{ 'catalog.search.results' | t: count: search.results_count, terms: escaped_terms }}</p>
+        <p class="catalog-count muted">{{ 'catalog.search.results' | t: count: search.results_count, terms: search.terms }}</p>
         {% render 'facets', results: search, section_id: section.id, enable_filtering: section.settings.enable_filtering, enable_sorting: section.settings.enable_sorting %}
         {% if search.results_count > 0 %}
           <div class="product-grid catalog-grid">

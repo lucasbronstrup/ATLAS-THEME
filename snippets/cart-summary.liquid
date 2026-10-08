@@ -15,7 +15,7 @@
 {% if shipping_threshold > 0 and cart_currency == threshold_currency %}
   {% assign shipping_remaining = shipping_threshold | minus: cart.total_price %}
   <div class="cart-shipping">
-    {% if shipping_remaining > 0 %}{% capture remaining_price %}{{ shipping_remaining | money }}{% endcapture %}<p>{{ 'catalog.cart.shipping_remaining' | t: amount: remaining_price }}</p>{% else %}<p>{{ 'catalog.cart.shipping_reached' | t }}</p>{% endif %}
+    {% if shipping_remaining > 0 %}{% capture remaining_price %}{{ shipping_remaining | money }}{% endcapture %}<p>{{ 'catalog.cart.shipping_remaining_html' | t: amount: remaining_price }}</p>{% else %}<p>{{ 'catalog.cart.shipping_reached' | t }}</p>{% endif %}
     <progress value="{{ cart.total_price | at_most: shipping_threshold }}" max="{{ shipping_threshold }}" aria-label="{{ 'catalog.cart.shipping_progress' | t }}"></progress>
   </div>
 {% endif %}

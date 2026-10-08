@@ -30,10 +30,10 @@
                 {% form 'product', offer, id: offer_form_id, class: 'cart-upsell__form', data-product-form: '', data-cart-upsell-form: '' %}
                   <input type="hidden" name="id" value="{{ offer_variant.id }}"><input type="hidden" name="quantity" value="1">
                   <p class="form-error cart-upsell__error" data-form-error role="alert" hidden></p>
-                  <button type="submit" name="add" class="button button--secondary cart-upsell__button" data-add-button aria-label="{{ 'catalog.upsell.add_product' | t: product: offer.title | escape }}">{{ 'catalog.upsell.add' | t }} <span aria-hidden="true">+</span></button>
+                  <button type="submit" name="add" class="button button--secondary cart-upsell__button" data-add-button aria-label="{{ 'catalog.upsell.add_product' | t: product: offer.title }}">{{ 'catalog.upsell.add' | t }} <span aria-hidden="true">+</span></button>
                 {% endform %}
               {% else %}
-                <a class="button button--secondary cart-upsell__button" href="{{ offer.url }}" aria-label="{{ 'catalog.upsell.choose_product' | t: product: offer.title | escape }}">{{ 'catalog.upsell.choose' | t }} <span aria-hidden="true">↗</span></a>
+                <a class="button button--secondary cart-upsell__button" href="{{ offer.url }}" aria-label="{{ 'catalog.upsell.choose_product' | t: product: offer.title }}">{{ 'catalog.upsell.choose' | t }} <span aria-hidden="true">↗</span></a>
               {% endif %}
             </div>
           </article>

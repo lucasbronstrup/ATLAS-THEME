@@ -34,10 +34,10 @@
   };
   const uniqueCardIds = (card, prefix) => {
     const identifiers = new Map();
-    if (card.id) identifiers.set(card.id, `${prefix}-${card.id}`);
-    card.querySelectorAll('[id]').forEach((node) => identifiers.set(node.id, `${prefix}-${node.id}`));
+    for (const node of [card, ...card.querySelectorAll('[id]')]) { const id = node.getAttribute('id'); if (id) identifiers.set(id, `${prefix}-${id}`); }
     for (const node of [card, ...card.querySelectorAll('*')]) {
-      if (node.id) node.id = identifiers.get(node.id);
+      const id = node.getAttribute('id');
+      if (id) node.setAttribute('id', identifiers.get(id));
       for (const attribute of ['for', 'form', 'aria-labelledby', 'aria-describedby', 'aria-controls']) {
         if (node.hasAttribute(attribute)) node.setAttribute(attribute, node.getAttribute(attribute).split(/\s+/).map((value) => identifiers.get(value) || value).join(' '));
       }

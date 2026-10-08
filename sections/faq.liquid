@@ -13,7 +13,7 @@
       "type": "text",
       "id": "heading",
       "label": "Título",
-      "default": "Uma seleção para você"
+      "default": "Perguntas frequentes"
     },
     {
       "type": "richtext",
@@ -51,7 +51,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     },
     {
       "type": "range",
@@ -61,7 +62,8 @@
       "max": 120,
       "step": 4,
       "default": 48,
-      "unit": "px"
+      "unit": "px",
+      "info": "Sem efeito enquanto “Usar espaçamento global nas seções” estiver ativo em Configurações do tema > Espaçamentos e botões."
     }
   ],
   "blocks": [
@@ -90,7 +92,25 @@
       "name": "Perguntas frequentes",
       "blocks": [
         {
-          "type": "question"
+          "type": "question",
+          "settings": {
+            "question": "Como posso entrar em contato?",
+            "answer": "<p>Use os canais de atendimento disponíveis na nossa página de contato.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Qual é o prazo de entrega?",
+            "answer": "<p>O prazo é calculado no checkout de acordo com o seu endereço.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Como faço uma troca ou devolução?",
+            "answer": "<p>Consulte a nossa política de reembolso para conhecer as condições.</p>"
+          }
         }
       ]
     }
