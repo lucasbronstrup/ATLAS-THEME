@@ -1,0 +1,51 @@
+{% doc %}
+  Renders optional cart offers selected by the merchant, excluding products already in the cart.
+  @param {string} context - Unique identifier for offer forms and heading
+  @example
+  {% render 'cart-upsells', context: section.id %}
+{% enddoc %}
+{% if settings.cart_upsell_enable and cart.item_count > 0 and settings.cart_upsell_products != blank %}
+  {% assign cart_product_ids = cart.items | map: 'product_id' %}
+  {% capture offers %}
+    {% for offer in settings.cart_upsell_products limit: 6 %}
+      {% unless cart_product_ids contains offer.id %}
+        {% if offer.available %}
+          {%- liquid
+            assign offer_variant = offer.selected_or_first_available_variant
+            assign can_add_directly = false
+            if offer.variants_count == 1 and offer.requires_selling_plan == false and offer_variant.available
+              assign can_add_directly = true
+            endif
+            if offer_variant.requires_selling_plan or offer_variant.quantity_rule.min > 1 or offer_variant.quantity_rule.increment > 1
+              assign can_add_directly = false
+            endif
+            assign offer_form_id = 'CartUpsellForm-' | append: context | append: '-' | append: offer.id
+          -%}
+          <article class="cart-upsell" data-cart-upsell-product="{{ offer.id }}">
+            <a class="cart-upsell__image" href="{{ offer.url }}" tabindex="-1" aria-hidden="true">{% if offer.featured_image %}{{ offer.featured_image | image_url: width: 180 | image_tag: loading: 'lazy', widths: '64, 120, 180', sizes: '64px' }}{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}</a>
+            <div class="cart-upsell__body">
+              <h3><a href="{{ offer.url }}">{{ offer.title | escape }}</a></h3>
+              {% if can_add_directly %}{% render 'price', product: offer, variant: offer_variant %}{% else %}{% render 'price', product: offer %}{% endif %}
+              {% if can_add_directly %}
+                {% form 'product', offer, id: offer_form_id, class: 'cart-upsell__form', data-product-form: '', data-cart-upsell-form: '' %}
+                  <input type="hidden" name="id" value="{{ offer_variant.id }}"><input type="hidden" name="quantity" value="1">
+                  <p class="form-error cart-upsell__error" data-form-error role="alert" hidden></p>
+                  <button type="submit" name="add" class="button button--secondary cart-upsell__button" data-add-button aria-label="{{ 'catalog.upsell.add_product' | t: product: offer.title | escape }}">{{ 'catalog.upsell.add' | t }} <span aria-hidden="true">+</span></button>
+                {% endform %}
+              {% else %}
+                <a class="button button--secondary cart-upsell__button" href="{{ offer.url }}" aria-label="{{ 'catalog.upsell.choose_product' | t: product: offer.title | escape }}">{{ 'catalog.upsell.choose' | t }} <span aria-hidden="true">↗</span></a>
+              {% endif %}
+            </div>
+          </article>
+        {% endif %}
+      {% endunless %}
+    {% endfor %}
+  {% endcapture %}
+  {% assign offers = offers | strip %}
+  {% if offers != blank %}
+    <section class="cart-upsells" data-cart-upsells aria-labelledby="CartUpsells-{{ context }}">
+      <div class="cart-upsells__heading"><h2 id="CartUpsells-{{ context }}">{% if settings.cart_upsell_heading != blank %}{{ settings.cart_upsell_heading | escape }}{% else %}{{ 'catalog.upsell.heading' | t }}{% endif %}</h2><p class="muted">{{ 'catalog.upsell.optional' | t }}</p></div>
+      <div class="cart-upsells__list">{{ offers }}</div>
+    </section>
+  {% endif %}
+{% endif %}

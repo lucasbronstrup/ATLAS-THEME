@@ -1,0 +1,90 @@
+{% doc %}
+  Renders native Shopify filtering and sorting controls with accessible GET forms.
+  @param {object} results - Collection or search object
+  @param {string} section_id - Unique section identifier
+  @param {boolean} enable_filtering - Show storefront filters
+  @param {boolean} enable_sorting - Show sort selection
+  @example
+  {% render 'facets', results: collection, section_id: section.id, enable_filtering: true, enable_sorting: true %}
+{% enddoc %}
+{%- liquid
+  assign selected_sort = results.sort_by | default: results.default_sort_by
+  assign action_url = results.url
+  if results.terms
+    assign action_url = routes.search_url
+  endif
+-%}
+{% if enable_filtering or enable_sorting %}
+  <form action="{{ action_url }}" method="get" class="facets" aria-label="{{ 'catalog.filters.label' | t }}">
+    {% if results.terms %}
+      <input type="hidden" name="q" value="{{ results.terms | escape }}">
+      <input type="hidden" name="options[prefix]" value="last">
+      <input type="hidden" name="type" value="{{ results.types | join: ',' | escape }}">
+    {% endif %}
+    <div class="facets__bar">
+      {% if enable_filtering %}
+        <details class="facets__panel">
+          <summary class="facets__toggle">{% render 'icon', name: 'filter' %}<span>{{ 'catalog.filters.label' | t }}</span><span aria-hidden="true">+</span></summary>
+          <div class="facets__groups">
+            {% for filter in results.filters %}
+              {% assign filter_index = forloop.index %}
+              <fieldset class="facet-group">
+                <legend>{{ filter.label | escape }}</legend>
+                {% case filter.type %}
+                  {% when 'boolean', 'list' %}
+                    <div class="facet-group__values">
+                      {% for value in filter.values %}
+                        <label class="facet-value" for="Filter-{{ section_id }}-{{ filter_index }}-{{ forloop.index }}">
+                          <input id="Filter-{{ section_id }}-{{ filter_index }}-{{ forloop.index }}" type="checkbox" name="{{ value.param_name }}" value="{{ value.value | escape }}" {% if value.active %}checked{% elsif value.count == 0 %}disabled{% endif %}>
+                          {% if value.swatch.color %}<span class="facet-swatch" style="--swatch-color: {{ value.swatch.color }}" aria-hidden="true"></span>{% endif %}
+                          <span>{{ value.label | escape }}</span><span class="muted">{{ value.count }}</span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% when 'price_range' %}
+                    <div class="facet-price">
+                      <label for="Filter-{{ section_id }}-Min">{{ 'catalog.filters.from' | t }}
+                        <input id="Filter-{{ section_id }}-Min" type="number" name="{{ filter.min_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100.0 }}" step="0.01" inputmode="decimal" placeholder="0" {% if filter.min_value.value %}value="{{ filter.min_value.value | divided_by: 100.0 }}"{% endif %}>
+                      </label>
+                      <label for="Filter-{{ section_id }}-Max">{{ 'catalog.filters.to' | t }}
+                        <input id="Filter-{{ section_id }}-Max" type="number" name="{{ filter.max_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100.0 }}" step="0.01" inputmode="decimal" placeholder="{{ filter.range_max | divided_by: 100.0 }}" {% if filter.max_value.value %}value="{{ filter.max_value.value | divided_by: 100.0 }}"{% endif %}>
+                      </label>
+                    </div>
+                    <p class="muted">{{ cart.currency.iso_code }}</p>
+                {% endcase %}
+              </fieldset>
+            {% else %}
+              <p class="muted">{{ 'catalog.filters.unavailable' | t }}</p>
+            {% endfor %}
+            <button type="submit" class="button">{{ 'catalog.filters.apply' | t }}</button>
+          </div>
+        </details>
+      {% endif %}
+      {% if enable_sorting %}
+        <div class="facets__sort">
+          <label for="SortBy-{{ section_id }}">{{ 'catalog.filters.sort' | t }}</label>
+          <select id="SortBy-{{ section_id }}" name="sort_by">
+            {% for option in results.sort_options %}<option value="{{ option.value | escape }}" {% if option.value == selected_sort %}selected{% endif %}>{{ option.name | escape }}</option>{% endfor %}
+          </select>
+          <button type="submit" class="button button--secondary facets__sort-button">{{ 'catalog.filters.apply' | t }}</button>
+        </div>
+      {% else %}
+        <input type="hidden" name="sort_by" value="{{ selected_sort | escape }}">
+      {% endif %}
+    </div>
+  </form>
+{% endif %}
+{% if enable_filtering %}
+  <div class="active-filters">
+    {% for filter in results.filters %}
+      {% for value in filter.active_values %}
+        <a href="{{ value.url_to_remove | escape }}" class="active-filter">{{ filter.label | escape }}: {{ value.label | escape }} <span aria-hidden="true">×</span><span class="visually-hidden">{{ 'catalog.filters.remove' | t }}</span></a>
+      {% endfor %}
+      {% if filter.type == 'price_range' %}
+        {% if filter.min_value.value != nil or filter.max_value.value != nil %}
+          <a href="{{ filter.url_to_remove | escape }}" class="active-filter">{{ filter.min_value.value | default: 0 | money }} — {{ filter.max_value.value | default: filter.range_max | money }} <span aria-hidden="true">×</span><span class="visually-hidden">{{ 'catalog.filters.remove' | t }}</span></a>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}

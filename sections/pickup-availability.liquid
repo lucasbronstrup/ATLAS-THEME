@@ -1,0 +1,21 @@
+{% assign pickup_locations = product_variant.store_availabilities | where: 'pick_up_enabled', true %}
+<div data-pickup-content>
+  {% if pickup_locations.size > 0 %}
+    <details>
+      <summary>{{ 'products.general.pickup_availability' | t }}</summary>
+      <ul>
+        {% for availability in pickup_locations %}
+          <li>
+            <strong>{{ availability.location.name | escape }}</strong>
+            <p>{% if availability.available %}{{ 'products.general.pickup_available' | t }} · {{ availability.pick_up_time }}{% else %}{{ 'products.general.pickup_unavailable' | t }}{% endif %}</p>
+            <address>{{ availability.location.address | format_address }}</address>
+            {% if availability.location.address.phone != blank %}<a href="tel:{{ availability.location.address.phone | escape }}">{{ availability.location.address.phone | escape }}</a>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endif %}
+</div>
+{% schema %}
+{"name":"Retirada na loja","settings":[]}
+{% endschema %}

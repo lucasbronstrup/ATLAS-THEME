@@ -1,0 +1,26 @@
+{% doc %}
+Renders canonical, social metadata and Organization structured data.
+{% enddoc %}
+<meta name="description" content="{{ page_description | default: settings.brand_description | escape }}">
+<link rel="canonical" href="{{ canonical_url }}">
+{% if request.page_type == 'search' %}<meta name="robots" content="noindex,follow">{% endif %}
+{% liquid
+ assign share_image = page_image | default: settings.social_image
+ assign og_type = 'website'
+ if request.page_type == 'product'
+ assign og_type = 'product'
+ elsif request.page_type == 'article'
+ assign og_type = 'article'
+ endif
+%}
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ page_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:description" content="{{ page_description | default: settings.brand_description | escape }}">
+{% if share_image %}<meta property="og:image" content="https:{{ share_image | image_url: width: 1200 }}"><meta property="og:image:width" content="{{ share_image.width | at_most: 1200 }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title | escape }}">
+<meta name="twitter:description" content="{{ page_description | default: settings.brand_description | escape }}">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":{{ shop.name | json }},"url":{{ shop.url | json }}{% if settings.logo %},"logo":{{ settings.logo | image_url: width: 500 | prepend: 'https:' | json }}{% endif %},"sameAs":[{% assign socials = 'social_instagram,social_facebook,social_youtube,social_tiktok' | split: ',' %}{% assign printed = false %}{% for social in socials %}{% if settings[social] != blank %}{% if printed %},{% endif %}{{ settings[social] | json }}{% assign printed = true %}{% endif %}{% endfor %}]}</script>
+{% if request.page_type == 'index' %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":{{ shop.name | json }},"url":{{ shop.url | json }}}</script>{% endif %}

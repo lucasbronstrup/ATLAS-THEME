@@ -1,0 +1,24 @@
+{% doc %}
+  Renders a blog article preview with optional metadata and excerpt.
+  @param {article} article - Article resource
+  @param {boolean} [show_date] - Show publication date
+  @param {boolean} [show_author] - Show author name
+  @param {boolean} [show_excerpt] - Show a shortened excerpt
+  @param {boolean} [show_image] - Show the article image
+  @param {boolean} [show_title] - Show the article title
+  @param {boolean} [show_read_more] - Show the native article link
+  @param {number} [excerpt_length] - Maximum excerpt character count
+  @param {string} [heading_level] - Use h3 for cards under a section heading
+  @example
+  {% render 'article-card', article: article, show_date: true, show_excerpt: true %}
+{% enddoc %}
+{% assign excerpt_size = excerpt_length | default: 160 %}
+<article class="article-card">
+  {% unless show_image == false %}<a href="{{ article.url }}" class="article-card__image atlas-visual-media" {% if show_title == false %}aria-label="{{ article.title | escape }}"{% else %}tabindex="-1" aria-hidden="true"{% endif %}>{% if article.image %}{{ article.image | image_url: width: 1000 | image_tag: widths: '250, 400, 600, 800, 1000', sizes: '(min-width: 1000px) 30vw, (min-width: 600px) 45vw, 100vw', loading: 'lazy' }}{% else %}{{ 'image' | placeholder_svg_tag }}{% endif %}</a>{% endunless %}
+  <div class="article-card__content">
+    {% if show_date or show_author %}<p class="article-card__meta muted">{% if show_date %}{{ article.published_at | time_tag: format: 'date' }}{% endif %}{% if show_author %}<span>{{ article.author | escape }}</span>{% endif %}</p>{% endif %}
+    {% unless show_title == false %}{% if heading_level == 'h3' %}<h3 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>{% else %}<h2 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h2>{% endif %}{% endunless %}
+    {% if show_excerpt and article.excerpt_or_content != blank %}<p class="muted">{{ article.excerpt_or_content | strip_html | truncate: excerpt_size }}</p>{% endif %}
+    {% unless show_read_more == false %}<a href="{{ article.url }}" class="text-link" aria-label="{{ 'secondary.blog.read_article' | t: title: article.title | escape }}">{{ 'secondary.read_more' | t }} <span aria-hidden="true">→</span></a>{% endunless %}
+  </div>
+</article>

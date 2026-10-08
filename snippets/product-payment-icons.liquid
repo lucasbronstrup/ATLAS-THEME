@@ -1,0 +1,15 @@
+{% doc %}
+  Renders native enabled payment logos with identifiers unique to the section and block.
+  @param {object} payment_types - Shopify enabled payment method identifiers.
+  @param {string} section_id - The parent section identifier.
+  @param {string} block_id - The parent block identifier.
+{% enddoc %}
+{% if payment_types.size > 0 %}
+  <div class="product-payment-icons" aria-label="{{ 'products.general.accepted_payments' | t }}">
+    {% for payment_type in payment_types %}
+      {% assign native_payment_id = 'pi-' | append: payment_type %}
+      {% assign payment_icon_id = native_payment_id | append: '-' | append: section_id | append: '-' | append: block_id %}
+      {{ payment_type | payment_type_svg_tag: class: 'payment-icon' | replace: native_payment_id, payment_icon_id }}
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,0 +1,28 @@
+{% doc %}
+  Renders one accessible product image, video or 3D model.
+  @param {media} media - The product media object.
+  @param {boolean} [eager] - Whether to prioritize loading this media image.
+  @param {string} [product_title] - The product title used by the native AR viewer.
+{% enddoc %}
+{%- liquid
+  assign loading = 'lazy'
+  assign priority = 'auto'
+  if eager
+    assign loading = 'eager'
+    assign priority = 'high'
+  endif
+-%}
+{% case media.media_type %}
+  {% when 'image' %}
+    <button class="product-media__zoom" type="button" data-media-zoom data-image-url="{{ media | image_url: width: 2400 }}" data-image-alt="{{ media.alt | escape }}" aria-label="{{ 'products.general.zoom_image' | t }}">
+      {{ media | image_url: width: 1600 | image_tag: loading: loading, fetchpriority: priority, widths: '360, 600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', class: 'product-media__image' }}
+      <span class="product-media__zoom-label" aria-hidden="true">＋</span>
+    </button>
+  {% when 'video' %}
+    {{ media | video_tag: image_size: '1200x', controls: true, preload: 'none', loop: false, class: 'product-media__video' }}
+  {% when 'external_video' %}
+    {{ media | external_video_tag: loading: 'lazy', class: 'product-media__video' }}
+  {% when 'model' %}
+    {{ media | model_viewer_tag: reveal: 'interaction', toggleable: true, class: 'product-media__model' }}
+    <button class="button button--secondary product-media__ar" type="button" data-shopify-xr data-shopify-model3d-id="{{ media.id }}" data-shopify-title="{{ product_title | escape }}" data-shopify-xr-hidden>{{ 'products.general.view_in_space' | t }}</button>
+{% endcase %}

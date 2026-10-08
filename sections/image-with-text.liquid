@@ -1,0 +1,93 @@
+<section class="section" style="--section-bg: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px"><div class="container image-text {% if section.settings.image_position == 'right' %}image-text--reverse{% endif %}"><div class="image-text-media">{% if section.settings.image %}{{ section.settings.image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '400,800,1200,1600', sizes: '(min-width: 750px) 50vw, 100vw' }}{% else %}<img src="{{ 'atlas-editorial.svg' | asset_url }}" alt="" width="1000" height="900" loading="lazy">{% endif %}</div><div class="image-text-copy"><p class="eyebrow">{{ section.settings.eyebrow | escape }}</p><h2>{{ section.settings.heading | escape }}</h2><div class="rte">{{ section.settings.text }}</div>{% if section.settings.link != blank %}<a class="button" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }} {% render 'icon', name: 'arrow' %}</a>{% endif %}</div></div></section>
+{% schema %}
+{
+  "name": "Imagem com texto",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto superior"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Uma seleção para você"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Texto do link",
+      "default": "Ver tudo"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagem"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Posição da imagem",
+      "options": [
+        {
+          "value": "left",
+          "label": "Esquerda"
+        },
+        {
+          "value": "right",
+          "label": "Direita"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto",
+      "default": "#172229"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaço superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaço inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Imagem com texto"
+    }
+  ]
+}
+{% endschema %}

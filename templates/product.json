@@ -1,0 +1,41 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {"type":"title","settings":{"show_vendor":true}},
+        "price": {"type":"price","settings":{"show_tax":true}},
+        "inventory": {"type":"inventory","settings":{"show_count":false}},
+        "variants": {"type":"variant_picker","settings":{"picker_type":"images","show_swatches":true}},
+        "purchase": {"type":"buy_buttons","settings":{"show_dynamic_checkout":true,"button_style":"accent","show_payment_icons":true}},
+        "guarantee": {"type":"guarantee","settings":{"heading":"Garantia e atendimento","text":"<p>Consulte as condições e políticas da loja antes de comprar.</p>","icon":"shield","show_refund_policy":true}},
+        "pickup": {"type":"pickup"},
+        "description": {"type":"description","settings":{"collapsible":true,"heading":"Detalhes do produto","open":true}},
+        "secure": {"type":"secure_payment","settings":{"heading":"Pagamento seguro","text":"<p>Finalize sua compra no checkout da Shopify.</p>","show_payment_icons":true,"show_payment_terms":true}}
+      },
+      "block_order": ["title","price","inventory","variants","purchase","guarantee","pickup","description","secure"],
+      "settings": {"media_width":"large","image_fit":"contain","sticky_information":true,"sticky_add_to_cart":true,"spacing":40}
+    },
+    "recommendations": {
+      "type":"product-recommendations",
+      "settings":{"eyebrow":"SELEÇÃO PARA VOCÊ","heading":"Talvez você goste","intent":"related","layout":"carousel","limit":8,"columns":4,"mobile_columns":"1.5","spacing":0,"mobile_spacing":0}
+    },
+    "recent": {
+      "type":"recently-viewed",
+      "settings":{"heading":"Visto recentemente","show_clear":true,"limit":8,"columns":4,"mobile_columns":"1.5","spacing":0,"mobile_spacing":0}
+    },
+    "comparison": {
+      "type":"comparison-table",
+      "blocks":{"ours":{"type":"brand","settings":{"heading":"Nossa marca","highlight":true,"values":"—\n—\n—"}},"others":{"type":"brand","settings":{"heading":"Outras marcas","values":"—\n—\n—"}}},
+      "block_order":["ours","others"],
+      "settings":{"heading":"Nossa marca e outras marcas","feature_heading":"Características","features":"Qualidade\nEspecificações\nAtendimento","padding_top":48,"padding_bottom":48}
+    },
+    "faq": {
+      "type":"faq",
+      "blocks":{"contact":{"type":"question","settings":{"question":"Como posso tirar dúvidas antes de comprar?","answer":"<p>Use os canais de atendimento informados na loja. Você também pode consultar os detalhes do produto e as políticas de compra.</p>"}}},
+      "block_order":["contact"],
+      "settings":{"heading":"Perguntas frequentes","padding_top":48,"padding_bottom":48}
+    }
+  },
+  "order": ["main","comparison","faq","recommendations","recent"]
+}

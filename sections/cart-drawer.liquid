@@ -1,0 +1,16 @@
+<dialog id="CartDrawer" class="cart-drawer" aria-labelledby="CartDrawerTitle">
+  <div class="cart-drawer__header"><h2 id="CartDrawerTitle">{{ 'catalog.cart.title' | t }} <span class="muted">({{ cart.item_count }})</span></h2><button type="button" class="icon-button" data-cart-close aria-label="{{ 'catalog.cart.close' | t }}"><span aria-hidden="true">×</span></button></div>
+  <div data-cart-content class="cart-drawer__content">
+    {% if cart.item_count == 0 %}
+      <div class="empty-state"><div class="empty-state__icon">{% render 'icon', name: 'bag' %}</div><h3>{{ 'catalog.cart.empty' | t }}</h3><p class="muted">{{ 'catalog.cart.empty_text' | t }}</p><a href="{{ routes.all_products_collection_url }}" class="button">{{ 'catalog.continue_shopping' | t }}</a></div>
+    {% else %}
+      <div class="cart-drawer__form">
+        <div class="cart-drawer__items"><form action="{{ routes.cart_url }}" method="post" id="CartDrawerForm">{% for item in cart.items %}{% render 'cart-line-item', item: item, context: 'Drawer' %}{% endfor %}<button type="submit" name="update" class="button button--secondary cart-update">{{ 'catalog.cart.update' | t }}</button></form>{% render 'cart-upsells', context: 'Drawer' %}</div>
+        <div class="cart-drawer__footer">{% render 'cart-summary', context: 'Drawer', form_id: 'CartDrawerForm', show_note: section.settings.show_note %}<a href="{{ routes.cart_url }}" class="text-link cart-drawer__view">{{ 'catalog.cart.view' | t }}</a></div>
+      </div>
+    {% endif %}
+  </div>
+</dialog>
+{% schema %}
+{"name":"Carrinho lateral","settings":[{"type":"checkbox","id":"show_note","label":"Permitir observação do pedido","default":true}]}
+{% endschema %}

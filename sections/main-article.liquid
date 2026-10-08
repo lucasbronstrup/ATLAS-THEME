@@ -1,0 +1,24 @@
+<article class="section article-page"><div class="container">
+  <div class="article-page__heading"><a href="{{ blog.url }}" class="text-link">← {{ blog.title | escape }}</a><h1 class="section-heading">{{ article.title | escape }}</h1><div class="article-card__meta muted">{% if section.settings.show_date %}{{ article.published_at | time_tag: format: 'date' }}{% endif %}{% if section.settings.show_author %}<span>{{ article.author | escape }}</span>{% endif %}</div></div>
+  {% if section.settings.show_image and article.image %}{{ article.image | image_url: width: 2000 | image_tag: widths: '600, 900, 1200, 1600, 2000', sizes: '(min-width: 1200px) 1100px, 100vw', loading: 'eager', class: 'article-page__hero' }}{% endif %}
+  <div class="article-page__body"><div class="rte">{{ article.content }}</div>
+    {% if section.settings.show_tags and article.tags.size > 0 %}<div class="blog-tags">{% for tag in article.tags %}<a href="{{ blog.url }}/tagged/{{ tag | handleize }}">{{ tag | escape }}</a>{% endfor %}</div>{% endif %}
+    {% if section.settings.show_share %}<div class="article-share"><span>{{ 'secondary.article.share' | t }}</span><a href="https://www.facebook.com/sharer/sharer.php?u={{ canonical_url | url_encode }}" target="_blank" rel="noopener" aria-label="{{ 'secondary.article.share_facebook' | t }}">Facebook</a><a href="https://wa.me/?text={{ article.title | append: ' ' | append: canonical_url | url_encode }}" target="_blank" rel="noopener" aria-label="{{ 'secondary.article.share_whatsapp' | t }}">WhatsApp</a></div>{% endif %}
+    {% if article.comments_enabled? %}
+      <div class="article-comments"><h2>{{ 'secondary.article.comments' | t: count: article.comments_count }}</h2>
+        {% paginate article.comments by 10 %}{% for comment in article.comments %}<div class="article-comment"><p><strong>{{ comment.author | escape }}</strong> <span class="muted">{{ comment.created_at | time_tag: format: 'date' }}</span></p><div class="rte">{{ comment.content }}</div></div>{% endfor %}{% render 'pagination', paginate: paginate %}{% endpaginate %}
+        {% form 'new_comment', article, id: 'CommentForm', class: 'comment-form' %}
+          <h3>{{ 'secondary.article.leave_comment' | t }}</h3>
+          {% if form.posted_successfully? %}<p class="form-success" role="status">{% if blog.moderated? %}{{ 'secondary.article.comment_moderated' | t }}{% else %}{{ 'secondary.article.comment_success' | t }}{% endif %}</p>{% endif %}
+          {% if form.errors %}<div class="form-error" role="alert">{{ form.errors | default_errors }}</div>{% endif %}
+          <div class="form-row"><div class="field"><label for="CommentAuthor">{{ 'secondary.contact.name' | t }} <span aria-hidden="true">*</span></label><input id="CommentAuthor" name="comment[author]" type="text" autocomplete="name" required value="{{ form.author | escape }}"></div><div class="field"><label for="CommentEmail">{{ 'secondary.contact.email' | t }} <span aria-hidden="true">*</span></label><input id="CommentEmail" name="comment[email]" type="email" autocomplete="email" autocapitalize="off" required value="{{ form.email | escape }}"></div></div>
+          <div class="field"><label for="CommentBody">{{ 'secondary.article.comment' | t }} <span aria-hidden="true">*</span></label><textarea id="CommentBody" name="comment[body]" rows="5" required>{{ form.body | escape }}</textarea></div><p class="muted form-required">{{ 'secondary.contact.required' | t }}</p><button type="submit" class="button">{{ 'secondary.article.post_comment' | t }}</button>
+        {% endform %}
+      </div>
+    {% endif %}
+  </div>
+</div></article>
+<script type="application/ld+json">{{ article | structured_data }}</script>
+{% schema %}
+{"name":"Artigo","settings":[{"type":"checkbox","id":"show_image","label":"Mostrar imagem de destaque","default":true},{"type":"checkbox","id":"show_date","label":"Mostrar data","default":true},{"type":"checkbox","id":"show_author","label":"Mostrar autor","default":true},{"type":"checkbox","id":"show_tags","label":"Mostrar categorias","default":true},{"type":"checkbox","id":"show_share","label":"Mostrar compartilhamento","default":true}]}
+{% endschema %}

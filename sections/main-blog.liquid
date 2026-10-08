@@ -1,0 +1,11 @@
+<section class="section blog-page"><div class="container">
+  <h1 class="section-heading">{{ blog.title | escape }}</h1>
+  {% if section.settings.show_tags and blog.all_tags.size > 0 %}<nav class="blog-tags" aria-label="{{ 'secondary.blog.categories' | t }}"><a href="{{ blog.url }}" {% if current_tags == blank %}aria-current="page"{% endif %}>{{ 'secondary.blog.all' | t }}</a>{% for tag in blog.all_tags %}{% capture tag_url %}{{ blog.url }}/tagged/{{ tag | handleize }}{% endcapture %}<a href="{{ tag_url }}" {% if current_tags contains tag %}aria-current="page"{% endif %}>{{ tag | escape }}</a>{% endfor %}</nav>{% endif %}
+  {% paginate blog.articles by section.settings.posts_per_page %}
+    <div class="blog-grid" style="--blog-columns: {{ section.settings.columns }}">{% for article in blog.articles %}{% render 'article-card', article: article, show_date: section.settings.show_date, show_author: section.settings.show_author, show_excerpt: section.settings.show_excerpt %}{% else %}<p class="muted">{{ 'secondary.blog.empty' | t }}</p>{% endfor %}</div>
+    {% render 'pagination', paginate: paginate %}
+  {% endpaginate %}
+</div></section>
+{% schema %}
+{"name":"Blog","settings":[{"type":"range","id":"posts_per_page","label":"Artigos por página","min":3,"max":18,"step":3,"default":9},{"type":"range","id":"columns","label":"Colunas no computador","min":2,"max":3,"step":1,"default":3},{"type":"checkbox","id":"show_date","label":"Mostrar data","default":true},{"type":"checkbox","id":"show_author","label":"Mostrar autor","default":false},{"type":"checkbox","id":"show_excerpt","label":"Mostrar resumo","default":true},{"type":"checkbox","id":"show_tags","label":"Mostrar categorias","default":true}]}
+{% endschema %}

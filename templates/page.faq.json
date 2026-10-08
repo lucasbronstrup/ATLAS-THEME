@@ -1,0 +1,32 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "show_title": true
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "heading": "Perguntas frequentes"
+      },
+      "blocks": {
+        "contact": {
+          "type": "question",
+          "settings": {
+            "question": "Como posso entrar em contato?",
+            "answer": "<p>Consulte a página de contato para ver os canais de atendimento da loja.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "contact"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "faq"
+  ]
+}

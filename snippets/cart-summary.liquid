@@ -1,0 +1,28 @@
+{% doc %}
+  Renders cart totals and optional notes associated with a cart form.
+  @param {string} context - Unique note identifier
+  @param {boolean} show_note - Render the order note field
+  @param {boolean} [show_accelerated] - Render available accelerated checkout buttons
+  @param {string} [form_id] - ID of the cart form when controls are rendered outside it
+  @example
+  {% render 'cart-summary', context: section.id, show_note: true %}
+{% enddoc %}
+{%- liquid
+  assign shipping_threshold = settings.free_shipping_threshold | times: 100
+  assign threshold_currency = settings.free_shipping_currency | default: shop.currency | upcase
+  assign cart_currency = cart.currency.iso_code | upcase
+-%}
+{% if shipping_threshold > 0 and cart_currency == threshold_currency %}
+  {% assign shipping_remaining = shipping_threshold | minus: cart.total_price %}
+  <div class="cart-shipping">
+    {% if shipping_remaining > 0 %}{% capture remaining_price %}{{ shipping_remaining | money }}{% endcapture %}<p>{{ 'catalog.cart.shipping_remaining' | t: amount: remaining_price }}</p>{% else %}<p>{{ 'catalog.cart.shipping_reached' | t }}</p>{% endif %}
+    <progress value="{{ cart.total_price | at_most: shipping_threshold }}" max="{{ shipping_threshold }}" aria-label="{{ 'catalog.cart.shipping_progress' | t }}"></progress>
+  </div>
+{% endif %}
+{% if show_note %}<details class="cart-note"><summary>{{ 'catalog.cart.note' | t }}</summary><label for="CartNote-{{ context }}" class="visually-hidden">{{ 'catalog.cart.note' | t }}</label><textarea id="CartNote-{{ context }}" name="note" rows="3" data-cart-note {% if form_id != blank %}form="{{ form_id }}"{% endif %}>{{ cart.note | escape }}</textarea></details>{% endif %}
+{% if cart.cart_level_discount_applications.size > 0 %}<ul class="cart-discounts cart-discounts--total" role="list">{% for discount in cart.cart_level_discount_applications %}<li><span>{{ discount.title | escape }}</span><span>−{{ discount.total_allocated_amount | money }}</span></li>{% endfor %}</ul>{% endif %}
+<div class="cart-subtotal"><span>{{ 'catalog.cart.subtotal' | t }}</span><strong>{{ cart.total_price | money_with_currency }}</strong></div>
+<p class="muted cart-tax">{% if cart.taxes_included %}{{ 'catalog.cart.taxes_included' | t }}{% else %}{{ 'catalog.cart.taxes_checkout' | t }}{% endif %}{% if shop.shipping_policy.body != blank %} <a href="{{ shop.shipping_policy.url }}">{{ 'catalog.cart.shipping_policy' | t }}</a>{% endif %}</p>
+<p class="form-error" data-cart-error role="alert" hidden></p>
+<button type="submit" name="checkout" class="button cart-checkout" {% if form_id != blank %}form="{{ form_id }}"{% endif %}>{% render 'icon', name: 'lock' %}{{ 'catalog.cart.checkout' | t }}</button>
+{% if show_accelerated and additional_checkout_buttons %}<div class="cart-accelerated">{{ content_for_additional_checkout_buttons }}</div>{% endif %}

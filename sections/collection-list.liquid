@@ -1,0 +1,220 @@
+{% if section.settings.layout == 'carousel' %}
+  {{ 'product-carousel.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
+{% endif %}
+{% assign placeholder_title = 'general.collection' | t %}
+<section class="section{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'catalog.collections.carousel_position' | t: current: '{current}', total: '{total}' | escape }}"{% endif %} style="--section-bg: {{ section.settings.background }}; --background: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        {% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}
+        <h2 id="CollectionListHeading-{{ section.id }}" {% if section.settings.heading == blank %}class="visually-hidden"{% endif %}>{{ section.settings.heading | default: placeholder_title | escape }}</h2>
+        {% if section.settings.text != blank %}<div class="rte muted">{{ section.settings.text }}</div>{% endif %}
+      </div>
+      <div class="atlas-product-row__actions">
+        {% if section.settings.link != blank %}<a class="text-link" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }} {% render 'icon', name: 'arrow' %}</a>{% endif %}
+        {% if section.settings.layout == 'carousel' %}
+          <div class="atlas-carousel-controls" data-carousel-controls hidden>
+            <button class="icon-button" type="button" data-carousel-prev aria-label="{{ 'catalog.collections.carousel_previous' | t }}" aria-controls="CollectionListTrack-{{ section.id }}" disabled>{% render 'icon', name: 'arrow' %}</button>
+            <button class="icon-button" type="button" data-carousel-next aria-label="{{ 'catalog.collections.carousel_next' | t }}" aria-controls="CollectionListTrack-{{ section.id }}">{% render 'icon', name: 'arrow' %}</button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="{% if section.settings.layout == 'carousel' %}atlas-carousel-track collection-list-carousel{% else %}collection-grid{% endif %} collection-grid--{{ section.settings.card_style }}" style="--columns:{{ section.settings.columns }};--mobile-columns:{{ section.settings.mobile_columns }}" {% if section.settings.layout == 'carousel' %}id="CollectionListTrack-{{ section.id }}" data-carousel-track tabindex="0" role="region" aria-labelledby="CollectionListHeading-{{ section.id }}"{% endif %}>
+      {% for block in section.blocks %}
+        {% assign collection = block.settings.collection %}
+        {% if section.settings.layout == 'carousel' %}<div class="atlas-carousel-cell">{% endif %}
+          <a class="collection-card" href="{{ block.settings.link | default: collection.url | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+            <div class="collection-card-image">
+              {% assign image = block.settings.image | default: collection.featured_image %}
+              {% if image %}{{ image | image_url: width: 700 | image_tag: loading: 'lazy', widths: '200,400,700', sizes: '(min-width: 750px) 20vw, 75vw' }}{% else %}{% assign placeholder_index = forloop.index0 | modulo: 6 | plus: 1 %}{{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}{% endif %}
+            </div>
+            <h3>{{ block.settings.heading | default: collection.title | default: placeholder_title | escape }} {% render 'icon', name: 'arrow' %}</h3>
+            {% if block.settings.text != blank %}<p class="muted">{{ block.settings.text | escape }}</p>{% endif %}
+          </a>
+        {% if section.settings.layout == 'carousel' %}</div>{% endif %}
+      {% endfor %}
+    </div>
+    {% if section.settings.layout == 'carousel' %}<span class="visually-hidden" data-carousel-status aria-live="polite" aria-atomic="true"></span>{% endif %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Lista de coleções",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto superior"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Uma seleção para você"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Texto do link",
+      "default": "Ver tudo"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Exibição das coleções",
+      "options": [{"value":"grid","label":"Grade"},{"value":"carousel","label":"Carrossel"}],
+      "default": "grid"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Estilo dos cartões",
+      "options": [
+        {
+          "value": "round",
+          "label": "Circular"
+        },
+        {
+          "value": "square",
+          "label": "Quadrado"
+        },
+        {
+          "value": "portrait",
+          "label": "Retrato"
+        }
+      ],
+      "default": "round"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Colunas no desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "unit": ""
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Colunas no celular",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "carousel_mobile_columns",
+      "label": "Coleções visíveis no carrossel no celular",
+      "options": [{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],
+      "default": "1.5"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto",
+      "default": "#172229"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaço superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaço inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Coleção",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Coleção"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem personalizada"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título personalizado"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Descrição"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link personalizado"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Lista de coleções",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

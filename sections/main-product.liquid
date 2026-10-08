@@ -1,0 +1,209 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign current_media = current_variant.featured_media | default: product.featured_media
+  assign product_form_id = 'ProductForm-' | append: section.id
+  assign purchase_block = section.blocks | where: 'type', 'buy_buttons' | first
+  assign purchase_style = purchase_block.settings.button_style | default: 'accent'
+  assign purchase_button_class = ''
+  if purchase_style == 'accent'
+    assign purchase_button_class = 'button--accent'
+  elsif purchase_style == 'outline'
+    assign purchase_button_class = 'button--secondary'
+  endif
+  assign allocation = current_variant.selected_selling_plan_allocation
+  if allocation == blank and current_variant.requires_selling_plan
+    assign allocation = current_variant.selling_plan_allocations.first
+  endif
+  assign media_aspect = '1'
+  case section.settings.media_ratio
+    when 'portrait'
+      assign media_aspect = '4 / 5'
+    when 'landscape'
+      assign media_aspect = '4 / 3'
+    when 'adapt'
+      assign media_aspect = 'auto'
+  endcase
+-%}
+<div id="Product-{{ section.id }}" class="product-section" data-atlas-product data-section-id="{{ section.id }}" data-product-url="{{ product.url }}" data-variant-id="{{ current_variant.id }}" data-featured-media="{{ current_media.id }}" data-update-error="{{ 'products.general.update_error' | t | escape }}" style="--product-space: {{ section.settings.spacing }}px; --product-space-mobile: {{ section.settings.mobile_spacing }}px; --media-fit: {{ section.settings.image_fit }}; --media-aspect: {{ media_aspect }}; --product-bg: {{ section.settings.background | default: settings.color_background }}; --media-bg: {{ section.settings.media_background | default: settings.color_surface }}; --ink: {{ section.settings.text_color | default: settings.color_text }}; --muted: {{ section.settings.muted_color | default: settings.color_muted }}">
+  <div class="container">
+  <div class="product-layout product-layout--{{ section.settings.media_width }}">
+    <div class="product-gallery" data-product-gallery aria-label="{{ 'products.general.media_gallery' | t }}">
+      <div class="product-gallery__stage">
+        {% if product.media.size > 0 %}
+          {% for media in product.media %}
+            <div id="Media-{{ section.id }}-{{ media.id }}" class="product-gallery__item{% if media.id == current_media.id %} is-active{% endif %}" data-product-media="{{ media.id }}" {% if media.id == current_media.id %}data-initial-media{% endif %}>
+              {% assign eager_media = false %}{% if media.id == current_media.id %}{% assign eager_media = true %}{% endif %}
+              {% render 'product-media', media: media, eager: eager_media, product_title: product.title %}
+            </div>
+          {% endfor %}
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'product-gallery__placeholder' }}
+        {% endif %}
+      </div>
+      {% if product.media.size > 1 %}
+        <div class="product-gallery__thumbnails" data-media-thumbnails aria-label="{{ 'products.general.media_thumbnails' | t }}">
+          {% for media in product.media %}
+            <button type="button" class="product-gallery__thumbnail" data-media-target="{{ media.id }}" aria-controls="Media-{{ section.id }}-{{ media.id }}" aria-current="{% if media.id == current_media.id %}true{% else %}false{% endif %}" aria-label="{{ 'products.general.media_position' | t: number: forloop.index }}">
+              {{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80, 120, 160', sizes: '72px', alt: media.alt }}
+              {% unless media.media_type == 'image' %}<span class="product-gallery__media-icon" aria-hidden="true">{% if media.media_type == 'model' %}◇{% else %}▶{% endif %}</span>{% endunless %}
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <dialog class="product-zoom" data-image-dialog aria-label="{{ 'products.general.zoom_image' | t }}">
+        <button type="button" class="product-zoom__close" data-close-image aria-label="{{ 'general.close' | t }}">×</button><img data-zoom-image alt="" width="1600" height="1600">
+      </dialog>
+    </div>
+    <div class="product-information{% if section.settings.sticky_information %} product-information--sticky{% endif %}">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when '@app' %}
+            {% render block %}
+          {% when 'title' %}
+            <div class="product-block product-heading" {{ block.shopify_attributes }}>
+              {% if block.settings.show_vendor and product.vendor != blank %}<p class="eyebrow muted">{{ product.vendor | escape }}</p>{% endif %}
+              <h1>{{ product.title | escape }}</h1>
+            </div>
+          {% when 'price' %}
+            <div class="product-block product-pricing" data-variant-region="{{ block.id }}" aria-live="polite" {{ block.shopify_attributes }}>
+              {% if current_variant %}{% render 'price', product: product, variant: current_variant, allocation: allocation %}{% else %}<p>{{ 'products.general.unavailable' | t }}</p>{% endif %}
+              {% if block.settings.show_tax %}
+                <p class="product-tax-note muted">{% if cart.taxes_included %}{{ 'products.general.taxes_included' | t }} {% endif %}{% if shop.shipping_policy.body != blank %}{{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}{% endif %}</p>
+              {% endif %}
+            </div>
+          {% when 'variant_picker' %}
+            <div class="product-block product-options" data-variant-region="{{ block.id }}" {{ block.shopify_attributes }}>
+              {% render 'product-variant-picker', product: product, block: block, section_id: section.id %}
+            </div>
+          {% when 'buy_buttons' %}
+            <div class="product-block product-purchase" data-variant-region="{{ block.id }}" data-purchase-region {{ block.shopify_attributes }}>
+              {% form 'product', product, id: product_form_id, class: 'product-form', data-product-form: '' %}
+                <input type="hidden" name="id" value="{{ current_variant.id }}" {% unless current_variant %}disabled{% endunless %}>
+                {% if form.errors %}<div class="product-form__error" role="alert">{{ form.errors | default_errors }}</div>{% endif %}
+                {% if current_variant.selling_plan_allocations.size > 0 %}
+                  <div class="product-form__plan">
+                    <label for="SellingPlan-{{ section.id }}">{{ 'products.general.purchase_options' | t }}</label>
+                    <select id="SellingPlan-{{ section.id }}" name="selling_plan" data-selling-plan {% if current_variant.requires_selling_plan %}required{% endif %}>
+                      {% unless current_variant.requires_selling_plan %}<option value="" {% if allocation == blank %}selected{% endif %}>{{ 'products.general.one_time_purchase' | t }}</option>{% endunless %}
+                      {% for plan_allocation in current_variant.selling_plan_allocations %}
+                        <option value="{{ plan_allocation.selling_plan.id }}" {% if allocation.selling_plan.id == plan_allocation.selling_plan.id %}selected{% endif %}>{{ plan_allocation.selling_plan.name | escape }} — {{ plan_allocation.price | money }}</option>
+                      {% endfor %}
+                    </select>
+                    {% if allocation.selling_plan.description != blank %}<p class="muted">{{ allocation.selling_plan.description }}</p>{% endif %}
+                    {% if allocation.checkout_charge_amount != allocation.price %}<p class="muted">{{ 'products.general.due_today' | t }} {{ allocation.checkout_charge_amount | money }}</p>{% endif %}
+                    {% if allocation.remaining_balance_charge_amount > 0 %}<p class="muted">{{ 'products.general.remaining_balance' | t }} {{ allocation.remaining_balance_charge_amount | money }}</p>{% endif %}
+                  </div>
+                {% endif %}
+                <div class="product-form__actions">
+                  <div class="product-quantity">
+                    <label class="visually-hidden" for="Quantity-{{ section.id }}">{{ 'products.general.quantity' | t }}</label>
+                    <button type="button" data-product-quantity-step="-1" aria-label="{{ 'products.general.decrease_quantity' | t }}">−</button>
+                    <input id="Quantity-{{ section.id }}" type="number" name="quantity" value="{{ current_variant.quantity_rule.min | default: 1 }}" min="{{ current_variant.quantity_rule.min | default: 1 }}" step="{{ current_variant.quantity_rule.increment | default: 1 }}" {% if current_variant.quantity_rule.max %}max="{{ current_variant.quantity_rule.max }}"{% endif %} inputmode="numeric" required>
+                    <button type="button" data-product-quantity-step="1" aria-label="{{ 'products.general.increase_quantity' | t }}">+</button>
+                  </div>
+                  <button class="button {{ purchase_button_class }} product-form__submit product-form__submit--{{ purchase_style }}" type="submit" name="add" data-add-button {% unless current_variant.available %}disabled{% endunless %}>
+                    {% if current_variant == blank %}{{ 'products.general.unavailable' | t }}{% elsif current_variant.available %}{{ 'products.general.add_to_cart' | t }}{% else %}{{ 'products.general.sold_out' | t }}{% endif %}
+                    {% render 'cart-icon' %}
+                  </button>
+                </div>
+                {% if current_variant.quantity_rule.min > 1 or current_variant.quantity_rule.increment > 1 or current_variant.quantity_rule.max != blank %}
+                  <p class="product-quantity__rules muted">{{ 'products.general.quantity_min' | t: quantity: current_variant.quantity_rule.min }}{% if current_variant.quantity_rule.increment > 1 %} · {{ 'products.general.quantity_increment' | t: quantity: current_variant.quantity_rule.increment }}{% endif %}{% if current_variant.quantity_rule.max %} · {{ 'products.general.quantity_max' | t: quantity: current_variant.quantity_rule.max }}{% endif %}</p>
+                {% endif %}
+                {% if current_variant.quantity_price_breaks.size > 0 %}
+                  <details class="product-volume"><summary>{{ 'products.general.volume_pricing' | t }}</summary><ul>{% for price_break in current_variant.quantity_price_breaks %}<li><span>{{ price_break.minimum_quantity }}+</span><span>{{ price_break.price | money }} {{ 'products.general.each' | t }}</span></li>{% endfor %}</ul></details>
+                {% endif %}
+                <p class="product-form__error" data-form-error role="alert" hidden></p>
+                {% if block.settings.show_dynamic_checkout and current_variant.available %}<div class="product-form__express">{{ form | payment_button }}</div>{% endif %}
+                {% if block.settings.show_payment_icons and shop.enabled_payment_types.size > 0 %}
+                  {% render 'product-payment-icons', payment_types: shop.enabled_payment_types, section_id: section.id, block_id: block.id %}
+                {% endif %}
+              {% endform %}
+              <p class="product-variant-error" data-variant-error role="alert" hidden></p>
+              <button class="product-variant-retry" type="button" data-retry-variant hidden>{{ 'products.general.retry' | t }}</button>
+            </div>
+          {% when 'description' %}
+            {% if product.description != blank %}<div class="product-block product-description rte" {{ block.shopify_attributes }}>{% if block.settings.collapsible %}<details {% if block.settings.open %}open{% endif %}><summary>{{ block.settings.heading | escape }}{% render 'icon', name: 'chevron' %}</summary><div class="product-description__body">{{ product.description }}</div></details>{% else %}{{ product.description }}{% endif %}</div>{% endif %}
+          {% when 'accordion' %}
+            <details class="product-block product-accordion" {% if block.settings.open %}open{% endif %} {{ block.shopify_attributes }}><summary>{{ block.settings.heading | escape }}{% render 'icon', name: 'chevron' %}</summary><div class="rte">{{ block.settings.content }}{{ block.settings.page.content }}</div></details>
+          {% when 'guarantee' %}
+            {% if block.settings.heading != blank or block.settings.text != blank %}
+              <div class="product-block product-guarantee" style="--guarantee-bg:{{ block.settings.background | default: settings.color_surface }}" {{ block.shopify_attributes }}>
+                <div class="product-guarantee__icon">{% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 144 | image_tag: loading: 'lazy', widths: '48, 96, 144', sizes: '48px', alt: '' }}{% elsif block.settings.icon != 'none' %}{% render 'icon', name: block.settings.icon %}{% endif %}</div>
+                <div>{% if block.settings.heading != blank %}<h3>{{ block.settings.heading | escape }}</h3>{% endif %}{% if block.settings.text != blank %}<div class="rte">{{ block.settings.text }}</div>{% endif %}{% if block.settings.link != blank %}<a href="{{ block.settings.link }}">{{ block.settings.link_label | escape }}</a>{% elsif block.settings.show_refund_policy and shop.refund_policy.body != blank %}<a href="{{ shop.refund_policy.url }}">{{ 'products.general.refund_policy' | t }}</a>{% endif %}</div>
+              </div>
+            {% endif %}
+          {% when 'secure_payment' %}
+            <div class="product-block product-secure-payment" data-variant-region="{{ block.id }}" {{ block.shopify_attributes }}>
+              <div class="product-secure-payment__heading">{% render 'icon', name: 'lock' %}<h3>{{ block.settings.heading | escape }}</h3></div>
+              {% if block.settings.text != blank %}<div class="rte muted">{{ block.settings.text }}</div>{% endif %}
+              {% if block.settings.show_payment_icons and shop.enabled_payment_types.size > 0 %}{% render 'product-payment-icons', payment_types: shop.enabled_payment_types, section_id: section.id, block_id: block.id %}{% endif %}
+              {% if block.settings.show_payment_terms and current_variant.available and current_variant.requires_selling_plan == false and allocation == blank %}{% assign payment_terms_form_id = 'PaymentTerms-' | append: section.id | append: '-' | append: block.id %}{% form 'product', product, id: payment_terms_form_id, class: 'product-payment-terms' %}<input type="hidden" name="id" value="{{ current_variant.id }}">{{ form | payment_terms }}{% endform %}{% endif %}
+            </div>
+          {% when 'text' %}
+            {% if block.settings.text != blank %}<div class="product-block product-text product-text--{{ block.settings.style }}" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>{% endif %}
+          {% when 'sku' %}
+            <div class="product-block product-sku muted" data-variant-region="{{ block.id }}" {{ block.shopify_attributes }}>{% if current_variant.sku != blank %}{{ 'products.general.sku' | t }}: {{ current_variant.sku | escape }}{% endif %}</div>
+          {% when 'inventory' %}
+            <div class="product-block product-stock" data-variant-region="{{ block.id }}" aria-live="polite" {{ block.shopify_attributes }}>
+              <span class="product-stock__dot{% unless current_variant.available %} product-stock__dot--unavailable{% endunless %}" aria-hidden="true"></span>
+              {% if current_variant == blank %}{{ 'products.general.unavailable' | t }}{% elsif current_variant.available %}{% if block.settings.show_count and current_variant.inventory_management == 'shopify' and current_variant.inventory_policy == 'deny' and current_variant.inventory_quantity > 0 %}{{ 'products.general.inventory_count' | t: count: current_variant.inventory_quantity }}{% else %}{{ 'products.general.available' | t }}{% endif %}{% else %}{{ 'products.general.sold_out' | t }}{% endif %}
+            </div>
+          {% when 'pickup' %}
+            <div class="product-block product-pickup" data-variant-region="{{ block.id }}" data-pickup-container data-root="{{ routes.root_url }}" {{ block.shopify_attributes }}>
+              {% assign pickup_locations = current_variant.store_availabilities | where: 'pick_up_enabled', true %}
+              {% if pickup_locations.size > 0 %}<details><summary>{{ 'products.general.pickup_availability' | t }}</summary><ul>{% for availability in pickup_locations %}<li><strong>{{ availability.location.name | escape }}</strong><p>{% if availability.available %}{{ 'products.general.pickup_available' | t }} · {{ availability.pick_up_time }}{% else %}{{ 'products.general.pickup_unavailable' | t }}{% endif %}</p><div>{{ availability.location.address | format_address }}</div></li>{% endfor %}</ul></details>{% endif %}
+            </div>
+          {% when 'share' %}
+            <div class="product-block product-share" {{ block.shopify_attributes }}><button type="button" class="product-share__button" data-share-product data-share-url="{{ shop.url }}{{ product.url }}" data-share-title="{{ product.title | escape }}" data-share-success="{{ 'products.general.link_copied' | t | escape }}">{{ 'products.general.share' | t }} <span aria-hidden="true">↗</span></button><span class="muted" data-share-status role="status"></span><noscript><a href="mailto:?subject={{ product.title | url_encode }}&amp;body={{ shop.url | append: product.url | url_encode }}">{{ 'products.general.share' | t }}</a></noscript></div>
+          {% when 'custom_liquid' %}
+            <div class="product-block" {{ block.shopify_attributes }}>{{ block.settings.custom_liquid }}</div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+  </div>
+  {% assign product_models = product.media | where: 'media_type', 'model' %}{% if product_models.size > 0 %}<script type="application/json" data-product-models>{{ product_models | json }}</script>{% endif %}
+  {% if section.settings.sticky_add_to_cart and purchase_block != blank %}
+    <div class="product-sticky" data-sticky-purchase data-variant-region="sticky" hidden>
+      <div class="container product-sticky__inner"><div class="product-sticky__details"><strong>{{ product.title | escape }}</strong>{% if current_variant %}{% render 'price', product: product, variant: current_variant, allocation: allocation %}{% endif %}</div><button class="button {{ purchase_button_class }}" type="button" data-sticky-submit {% unless current_variant.available %}disabled{% endunless %}>{% if current_variant == blank %}{{ 'products.general.unavailable' | t }}{% elsif current_variant.available %}{{ 'products.general.add_to_cart' | t }}{% else %}{{ 'products.general.sold_out' | t }}{% endif %}{% render 'cart-icon' %}</button></div>
+    </div>
+  {% endif %}
+  <span class="visually-hidden" data-variant-status role="status" aria-live="polite"></span>
+</div>
+<script type="application/ld+json">{{ product | structured_data }}</script>
+{% schema %}
+{
+  "name":"Informações do produto",
+  "tag":"section",
+  "settings":[
+    {"type":"select","id":"media_width","label":"Largura da galeria","options":[{"value":"balanced","label":"Equilibrada"},{"value":"large","label":"Ampla"}],"default":"large"},
+    {"type":"select","id":"image_fit","label":"Ajuste da imagem","options":[{"value":"contain","label":"Mostrar inteira"},{"value":"cover","label":"Preencher"}],"default":"contain"},
+    {"type":"select","id":"media_ratio","label":"Proporção da galeria","options":[{"value":"square","label":"Quadrada"},{"value":"portrait","label":"Retrato"},{"value":"landscape","label":"Paisagem"},{"value":"adapt","label":"Original"}],"default":"square"},
+    {"type":"checkbox","id":"sticky_information","label":"Manter informações fixas ao rolar","default":true},
+    {"type":"checkbox","id":"sticky_add_to_cart","label":"Barra de compra fixa","default":true},
+    {"type":"range","id":"spacing","label":"Espaçamento vertical no computador","min":20,"max":100,"step":4,"default":40},
+    {"type":"range","id":"mobile_spacing","label":"Espaçamento vertical no celular","min":12,"max":80,"step":4,"default":24},
+    {"type":"color","id":"background","label":"Fundo (vazio usa o tema)"},
+    {"type":"color","id":"media_background","label":"Fundo da galeria (vazio usa o tema)"},
+    {"type":"color","id":"text_color","label":"Texto (vazio usa o tema)"},
+    {"type":"color","id":"muted_color","label":"Texto secundário (vazio usa o tema)"}
+  ],
+  "blocks":[
+    {"type":"@app"},
+    {"type":"title","name":"Título","limit":1,"settings":[{"type":"checkbox","id":"show_vendor","label":"Mostrar fabricante","default":true}]},
+    {"type":"price","name":"Preço","limit":1,"settings":[{"type":"checkbox","id":"show_tax","label":"Mostrar informações de impostos e frete","default":true}]},
+    {"type":"variant_picker","name":"Seleção de variantes","limit":1,"settings":[{"type":"select","id":"picker_type","label":"Estilo","options":[{"value":"buttons","label":"Botões"},{"value":"images","label":"Imagens das variantes"},{"value":"dropdown","label":"Menu suspenso"}],"default":"buttons"},{"type":"text","id":"image_option_name","label":"Nome da opção com imagens","info":"Vazio usa a primeira opção. Usa a mídia real da variante; sem imagem, usa botão de texto."},{"type":"checkbox","id":"show_swatches","label":"Mostrar amostras nativas de cor e imagem","default":true}]},
+    {"type":"buy_buttons","name":"Botões de compra","limit":1,"settings":[{"type":"checkbox","id":"show_dynamic_checkout","label":"Mostrar checkout acelerado","default":true},{"type":"select","id":"button_style","label":"Estilo de Adicionar ao carrinho","options":[{"value":"accent","label":"Cor de destaque"},{"value":"solid","label":"Cor principal"},{"value":"outline","label":"Contorno"}],"default":"accent"},{"type":"checkbox","id":"show_payment_icons","label":"Mostrar meios de pagamento habilitados","default":true}]},
+    {"type":"guarantee","name":"Garantia horizontal","settings":[{"type":"paragraph","content":"Informe apenas garantias e condições reais da sua loja."},{"type":"text","id":"heading","label":"Título","default":"Garantia e atendimento"},{"type":"richtext","id":"text","label":"Texto","default":"<p>Consulte as condições e políticas da loja antes de comprar.</p>"},{"type":"select","id":"icon","label":"Ícone","options":[{"value":"shield","label":"Escudo"},{"value":"return","label":"Devolução"},{"value":"check","label":"Verificado"},{"value":"lock","label":"Cadeado"},{"value":"none","label":"Nenhum"}],"default":"shield"},{"type":"image_picker","id":"image","label":"Imagem personalizada"},{"type":"url","id":"link","label":"Link"},{"type":"text","id":"link_label","label":"Texto do link","default":"Ver condições"},{"type":"checkbox","id":"show_refund_policy","label":"Usar política de reembolso da loja quando não houver link","default":true},{"type":"color","id":"background","label":"Fundo (vazio usa o tema)"}]},
+    {"type":"secure_payment","name":"Pagamento seguro","limit":1,"settings":[{"type":"text","id":"heading","label":"Título","default":"Pagamento seguro"},{"type":"richtext","id":"text","label":"Texto","default":"<p>Finalize sua compra no checkout da Shopify. Confira os meios de pagamento disponíveis na finalização.</p>"},{"type":"checkbox","id":"show_payment_icons","label":"Mostrar meios de pagamento habilitados","default":true},{"type":"checkbox","id":"show_payment_terms","label":"Mostrar condições nativas do Shop Pay quando elegível","default":true}]},
+    {"type":"description","name":"Descrição","limit":1,"settings":[{"type":"checkbox","id":"collapsible","label":"Usar painel expansível","default":true},{"type":"text","id":"heading","label":"Título","default":"Detalhes do produto"},{"type":"checkbox","id":"open","label":"Abrir por padrão","default":true}]},
+    {"type":"accordion","name":"Painel expansível","settings":[{"type":"text","id":"heading","label":"Título","default":"Mais informações"},{"type":"richtext","id":"content","label":"Conteúdo"},{"type":"page","id":"page","label":"Página de conteúdo"},{"type":"checkbox","id":"open","label":"Abrir por padrão","default":false}]},
+    {"type":"text","name":"Texto","settings":[{"type":"richtext","id":"text","label":"Conteúdo"},{"type":"select","id":"style","label":"Estilo","options":[{"value":"plain","label":"Simples"},{"value":"note","label":"Destaque suave"}],"default":"plain"}]},
+    {"type":"sku","name":"Código SKU","limit":1},
+    {"type":"inventory","name":"Disponibilidade","limit":1,"settings":[{"type":"checkbox","id":"show_count","label":"Mostrar quantidade real de estoque","default":false}]},
+    {"type":"pickup","name":"Retirada na loja","limit":1},
+    {"type":"share","name":"Compartilhar","limit":1},
+    {"type":"custom_liquid","name":"Liquid personalizado","settings":[{"type":"liquid","id":"custom_liquid","label":"Código Liquid"}]}
+  ]
+}
+{% endschema %}

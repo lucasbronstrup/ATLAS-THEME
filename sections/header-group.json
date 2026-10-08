@@ -1,0 +1,20 @@
+{
+  "type": "header",
+  "name": "Cabeçalho",
+  "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "settings": {}
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "search_style": "commerce"
+      }
+    }
+  },
+  "order": [
+    "announcement",
+    "header"
+  ]
+}

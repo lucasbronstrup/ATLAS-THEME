@@ -1,0 +1,158 @@
+{{ 'visual-sections.css' | asset_url | stylesheet_tag }}
+<div class="section atlas-visual-section" style="{% if section.settings.spacing > 0 %}--visual-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--visual-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}"><div class="{% unless section.settings.full_width %}container{% endunless %}"><div class="atlas-overlay-banner atlas-visual-media atlas-overlay-banner--{{ section.settings.alignment }}" style="--overlay-height:{{ section.settings.height }}px;--overlay-height-mobile:{{ section.settings.mobile_height }}px;--overlay-color:{{ section.settings.overlay_color }};--overlay-opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }};--overlay-ink:{{ section.settings.banner_text_color }}">
+<div class="atlas-overlay-banner__media">{% if section.settings.image %}{{ section.settings.image | image_url: width: 2400 | image_tag: loading: 'lazy', widths: '500,800,1200,1600,2000,2400', sizes: '100vw', alt: section.settings.image_alt }}{% else %}<img src="{{ 'atlas-editorial.svg' | asset_url }}" alt="" width="1000" height="900" loading="lazy">{% endif %}</div><div class="atlas-overlay-banner__shade" aria-hidden="true"></div>
+<div class="atlas-overlay-banner__content">{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}{% if section.settings.heading != blank %}<h2>{{ section.settings.heading | escape }}</h2>{% endif %}{% if section.settings.text != blank %}<div class="rte">{{ section.settings.text }}</div>{% endif %}{% if section.settings.link != blank and section.settings.button_label != blank %}<a class="button button--accent" href="{{ section.settings.link }}">{{ section.settings.button_label | escape }}{% render 'icon', name: 'arrow' %}</a>{% endif %}</div>
+</div></div></div>
+{% schema %}
+{
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
+  "name": "Imagem com texto interno",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto de apoio"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Espaço no computador (0 usa o tema)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Espaço no celular (0 usa o tema)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto (vazio usa o tema)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagem de fundo"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Descrição acessível da imagem"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link do botão"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto do botão",
+      "default": "Explorar"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Ocupar toda a largura",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Altura no computador",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Altura no celular",
+      "min": 260,
+      "max": 600,
+      "step": 20,
+      "default": 360
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Posição do texto",
+      "options": [
+        {
+          "value": "left",
+          "label": "Esquerda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        },
+        {
+          "value": "right",
+          "label": "Direita"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Cor da camada sobre a imagem",
+      "default": "#172229"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacidade da camada",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "banner_text_color",
+      "label": "Texto dentro da imagem",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Imagem com texto interno",
+      "settings": {
+        "eyebrow": "NOVAS POSSIBILIDADES",
+        "heading": "Encontre uma nova perspectiva.",
+        "text": "<p>Uma seleção de detalhes para o seu dia.</p>"
+      }
+    }
+  ]
+}
+{% endschema %}

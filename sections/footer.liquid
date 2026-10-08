@@ -1,0 +1,100 @@
+<footer class="site-footer" style="--section-bg: {{ section.settings.background }}; --section-ink: {{ section.settings.text_color }}; --pad-top: {{ section.settings.padding_top }}px; --pad-bottom: {{ section.settings.padding_bottom }}px"><div class="container footer-grid"><div class="footer-brand"><a class="brand" href="{{ routes.root_url }}">{{ settings.brand_name | default: shop.name | escape }}</a><div class="rte muted">{{ section.settings.text }}</div><div class="social-links">{% assign socials = 'social_instagram,social_facebook,social_youtube,social_tiktok' | split: ',' %}{% for social in socials %}{% if settings[social] != blank %}<a href="{{ settings[social] }}" target="_blank" rel="noopener">{{ social | remove: 'social_' | capitalize }}</a>{% endif %}{% endfor %}</div></div>{% for block in section.blocks %}<div {{ block.shopify_attributes }}><h2 class="footer-heading">{{ block.settings.heading | escape }}</h2>{% for link in block.settings.menu.links %}<a class="footer-link" href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}</div>{% endfor %}{% if section.settings.newsletter %}<div class="footer-newsletter"><h2 class="footer-heading">{{ section.settings.newsletter_heading | escape }}</h2><p class="muted">{{ section.settings.newsletter_text | escape }}</p>{% form 'customer', id: 'FooterNewsletter' %}<input type="hidden" name="contact[tags]" value="newsletter"><label class="visually-hidden" for="FooterEmail">{{ 'general.email' | t }}</label><div class="newsletter-fields"><input id="FooterEmail" type="email" name="contact[email]" placeholder="{{ 'general.email_placeholder' | t }}" required autocomplete="email"><button class="button button--accent" aria-label="{{ 'general.subscribe' | t }}">{% render 'icon', name: 'arrow' %}</button></div>{{ form.errors | default_errors }}{% if form.posted_successfully? %}<p role="status">{{ 'general.subscribed' | t }}</p>{% endif %}{% endform %}</div>{% endif %}</div><div class="container footer-bottom"><div class="localization">{% if section.settings.localization %}{% form 'localization', id: 'FooterLocalization' %}{% if localization.available_countries.size > 1 %}<label for="FooterCountry">{{ 'general.country' | t }}</label><select id="FooterCountry" name="country_code">{% for country in localization.available_countries %}<option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>{{ country.name | escape }} ({{ country.currency.iso_code }})</option>{% endfor %}</select>{% endif %}{% if localization.available_languages.size > 1 %}<label for="FooterLanguage">{{ 'general.language' | t }}</label><select id="FooterLanguage" name="locale_code">{% for language in localization.available_languages %}<option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>{{ language.endonym_name | capitalize }}</option>{% endfor %}</select>{% endif %}{% if localization.available_countries.size > 1 or localization.available_languages.size > 1 %}<button class="button button--secondary">{{ 'general.update' | t }}</button>{% endif %}{% endform %}{% endif %}</div>{% if section.settings.payments %}<ul class="payment-icons" role="list">{% for payment in shop.enabled_payment_types %}<li>{{ payment | payment_type_svg_tag: class: 'payment-icon' | replace: 'pi-', 'footer-payment-' }}</li>{% endfor %}</ul>{% endif %}<div class="footer-legal"><p>© {{ 'now' | date: '%Y' }} {{ shop.name | escape }}.</p>{% for policy in shop.policies %}{% if policy != blank %}<a href="{{ policy.url }}">{{ policy.title | escape }}</a>{% endif %}{% endfor %}</div></div></footer>
+{% schema %}
+{
+  "name": "Rodapé",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição da loja",
+      "default": "<p>Produtos selecionados. Uma experiência pensada para você.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter",
+      "label": "Cadastro de newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Título da newsletter",
+      "default": "Fique por dentro"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_text",
+      "label": "Texto da newsletter",
+      "default": "Receba novidades, lançamentos e conteúdos da nossa loja."
+    },
+    {
+      "type": "checkbox",
+      "id": "localization",
+      "label": "Seletores de país e idioma",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payments",
+      "label": "Bandeiras de pagamento da Shopify",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "As bandeiras vêm dos meios de pagamento habilitados na Shopify e podem variar por região e moeda. Ative-os nas configurações de pagamento da loja."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto",
+      "default": "#172229"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaço superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaço inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Explore"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 3
+}
+{% endschema %}

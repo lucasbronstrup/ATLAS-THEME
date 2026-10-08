@@ -1,0 +1,36 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
+  <title>{{ 'secondary.gift_card.title' | t }} — {{ shop.name | escape }}</title>
+  {% if settings.favicon %}<link rel="icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">{% endif %}
+  {{ content_for_header }}
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+  {{ 'catalog.css' | asset_url | stylesheet_tag }}{{ 'rhythm.css' | asset_url | stylesheet_tag }}
+  {% render 'theme-styles' %}
+</head>
+<body class="gift-card-page">
+  <main class="gift-card"><a class="gift-card__brand" href="{{ routes.root_url }}">{{ shop.name | escape }}</a><h1>{{ 'secondary.gift_card.title' | t }}</h1>
+    <div class="gift-card__visual"><span>{{ shop.name | escape }}</span><strong>{{ gift_card.initial_value | money_with_currency }}</strong><span aria-hidden="true">✦</span></div>
+    {% if gift_card.expired %}<p class="form-error">{{ 'secondary.gift_card.expired' | t }}</p>{% elsif gift_card.enabled == false %}<p class="form-error">{{ 'secondary.gift_card.disabled' | t }}</p>{% endif %}
+    {% if gift_card.balance != gift_card.initial_value %}<p>{{ 'secondary.gift_card.balance' | t }} <strong>{{ gift_card.balance | money_with_currency }}</strong></p>{% endif %}
+    {% if gift_card.expires_on %}{% assign expiry_date = gift_card.expires_on | date: '%d/%m/%Y' %}<p class="muted">{{ 'secondary.gift_card.expires' | t: date: expiry_date }}</p>{% endif %}
+    {% if gift_card.message != blank %}<p class="gift-card__message">{{ gift_card.message | escape }}</p>{% endif %}
+    <p class="muted">{{ 'secondary.gift_card.instructions' | t }}</p>
+    <label for="GiftCardCode" class="visually-hidden">{{ 'secondary.gift_card.code' | t }}</label><input id="GiftCardCode" class="gift-card__code" readonly value="{{ gift_card.code | format_code }}" aria-label="{{ 'secondary.gift_card.code' | t }}">
+    <button type="button" class="button button--secondary" data-copy-gift-card>{{ 'secondary.gift_card.copy' | t }}</button><p class="muted gift-card__status" data-copy-status role="status"></p>
+    <a href="{{ shop.url }}" class="button">{{ 'catalog.continue_shopping' | t }}</a>
+    {% if gift_card.pass_url %}<a href="{{ gift_card.pass_url }}" class="text-link">{{ 'secondary.gift_card.wallet' | t }}</a>{% endif %}
+    <button type="button" class="text-link" data-print-gift-card>{{ 'secondary.gift_card.print' | t }}</button>
+  </main>
+  <script>
+    document.querySelector('[data-copy-gift-card]').addEventListener('click', async () => {
+      const code = document.getElementById('GiftCardCode');
+      try { await navigator.clipboard.writeText(code.value.replace(/\s/g, '')); document.querySelector('[data-copy-status]').textContent = {{ 'secondary.gift_card.copied' | t | json }}; }
+      catch { code.focus(); code.select(); document.querySelector('[data-copy-status]').textContent = {{ 'secondary.gift_card.copy_manual' | t | json }}; }
+    });
+    document.querySelector('[data-print-gift-card]').addEventListener('click', () => window.print());
+  </script>
+</body>
+</html>

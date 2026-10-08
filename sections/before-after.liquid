@@ -1,0 +1,167 @@
+{{ 'visual-sections.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'before-after.js' | asset_url }}" defer></script>
+{% assign comparison_before_alt = section.settings.before_alt | default: section.settings.before_image.alt | default: section.settings.before_label %}{% assign comparison_after_alt = section.settings.after_alt | default: section.settings.after_image.alt | default: section.settings.after_label %}
+<div class="section atlas-visual-section" style="{% if section.settings.spacing > 0 %}--visual-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--visual-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}"><div class="container">{% if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.text != blank %}<div class="section-heading"><div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}{% if section.settings.heading != blank %}<h2>{{ section.settings.heading | escape }}</h2>{% endif %}{% if section.settings.text != blank %}<div class="rte muted">{{ section.settings.text }}</div>{% endif %}</div></div>{% endif %}
+  <div class="atlas-comparison atlas-visual-media" data-before-after data-before-label="{{ section.settings.before_label | escape }}" data-after-label="{{ section.settings.after_label | escape }}" style="--before-after-position:{{ section.settings.start_position }}%;--comparison-ratio:{{ section.settings.aspect_ratio }};--comparison-fit:{{ section.settings.image_fit }}">
+    <div class="atlas-comparison__image atlas-comparison__image--before">{% if section.settings.before_image %}{{ section.settings.before_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '400,700,1000,1400,2000', sizes: '(min-width: 1400px) 1360px, 100vw', alt: comparison_before_alt }}{% else %}{{ 'lifestyle-1' | placeholder_svg_tag: 'atlas-comparison__placeholder' }}{% endif %}</div>
+    <div class="atlas-comparison__image atlas-comparison__image--after">{% if section.settings.after_image %}{{ section.settings.after_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '400,700,1000,1400,2000', sizes: '(min-width: 1400px) 1360px, 100vw', alt: comparison_after_alt }}{% else %}{{ 'lifestyle-2' | placeholder_svg_tag: 'atlas-comparison__placeholder' }}{% endif %}</div>
+    <span class="atlas-comparison__badge atlas-comparison__badge--before">{{ section.settings.before_label | escape }}</span><span class="atlas-comparison__badge atlas-comparison__badge--after">{{ section.settings.after_label | escape }}</span>
+    <div class="atlas-comparison__divider" aria-hidden="true"><span>↔</span></div>
+    <label class="visually-hidden" for="Comparison-{{ section.id }}">{{ section.settings.slider_label | escape }}</label><input class="atlas-comparison__range" id="Comparison-{{ section.id }}" type="range" min="0" max="100" step="1" value="{{ section.settings.start_position }}" data-comparison-input aria-describedby="ComparisonHelp-{{ section.id }}">
+  </div><div class="atlas-comparison__caption"><p id="ComparisonHelp-{{ section.id }}" class="muted">{{ section.settings.instructions | escape }}</p><output for="Comparison-{{ section.id }}" data-comparison-output>{{ section.settings.start_position }}%</output></div>
+</div></div>
+{% schema %}
+{
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
+  "name": "Antes e depois",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto de apoio"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Espaço no computador (0 usa o tema)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Espaço no celular (0 usa o tema)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto (vazio usa o tema)"
+    },
+    {
+      "type": "text",
+      "id": "before_label",
+      "label": "Legenda da imagem anterior",
+      "default": "Antes"
+    },
+    {
+      "type": "text",
+      "id": "after_label",
+      "label": "Legenda da imagem posterior",
+      "default": "Depois"
+    },
+    {
+      "type": "image_picker",
+      "id": "before_image",
+      "label": "Imagem anterior"
+    },
+    {
+      "type": "image_picker",
+      "id": "after_image",
+      "label": "Imagem posterior"
+    },
+    {
+      "type": "text",
+      "id": "before_alt",
+      "label": "Descrição acessível da imagem anterior"
+    },
+    {
+      "type": "text",
+      "id": "after_alt",
+      "label": "Descrição acessível da imagem posterior"
+    },
+    {
+      "type": "text",
+      "id": "slider_label",
+      "label": "Nome acessível do controle",
+      "default": "Comparar as duas imagens"
+    },
+    {
+      "type": "text",
+      "id": "instructions",
+      "label": "Orientação de uso",
+      "default": "Arraste o controle ou use as setas do teclado para comparar."
+    },
+    {
+      "type": "range",
+      "id": "start_position",
+      "label": "Posição inicial",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Proporção",
+      "options": [
+        {
+          "value": "16/9",
+          "label": "Panorâmica"
+        },
+        {
+          "value": "4/3",
+          "label": "Horizontal"
+        },
+        {
+          "value": "1/1",
+          "label": "Quadrada"
+        }
+      ],
+      "default": "16/9"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Enquadramento",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Preencher"
+        },
+        {
+          "value": "contain",
+          "label": "Imagem inteira"
+        }
+      ],
+      "default": "cover"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Antes e depois",
+      "settings": {
+        "heading": "Veja os detalhes de perto.",
+        "text": "<p>Compare duas imagens da sua escolha.</p>"
+      }
+    }
+  ]
+}
+{% endschema %}

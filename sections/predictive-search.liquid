@@ -1,0 +1,22 @@
+{% if predictive_search.performed %}
+  <div data-predictive-results class="predictive-results">
+    {% if predictive_search.resources.queries.size > 0 %}
+      <div class="predictive-results__group"><h3>{{ 'catalog.search.suggestions' | t }}</h3><ul role="list">{% for query in predictive_search.resources.queries %}<li><a href="{{ query.url }}">{{ query.styled_text }}</a></li>{% endfor %}</ul></div>
+    {% endif %}
+    {% if predictive_search.resources.products.size > 0 %}
+      <div class="predictive-results__group"><h3>{{ 'catalog.search.products' | t }}</h3>
+        <ul role="list">{% for product in predictive_search.resources.products %}<li><a href="{{ product.url }}" class="predictive-product">{% if product.featured_image %}{{ product.featured_image | image_url: width: 144 | image_tag: loading: 'lazy', width: 72, height: 72 }}{% endif %}<span><span class="predictive-product__title">{{ product.title | escape }}</span>{% render 'price', product: product %}</span></a></li>{% endfor %}</ul>
+      </div>
+    {% endif %}
+    {% if predictive_search.resources.collections.size > 0 %}
+      <div class="predictive-results__group"><h3>{{ 'catalog.search.collections' | t }}</h3><ul role="list">{% for collection in predictive_search.resources.collections %}<li><a href="{{ collection.url }}">{{ collection.title | escape }}</a></li>{% endfor %}</ul></div>
+    {% endif %}
+    {% if predictive_search.resources.pages.size > 0 or predictive_search.resources.articles.size > 0 %}
+      <div class="predictive-results__group"><h3>{{ 'catalog.search.pages' | t }}</h3><ul role="list">{% for page in predictive_search.resources.pages %}<li><a href="{{ page.url }}">{{ page.title | escape }}</a></li>{% endfor %}{% for article in predictive_search.resources.articles %}<li><a href="{{ article.url }}">{{ article.title | escape }}</a></li>{% endfor %}</ul></div>
+    {% endif %}
+    {% assign escaped_terms = predictive_search.terms | escape %}<a class="predictive-results__all" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&amp;options%5Bprefix%5D=last&amp;type=product,article,page">{{ 'catalog.search.all_results' | t: terms: escaped_terms }} →</a>
+  </div>
+{% endif %}
+{% schema %}
+{"name":"Busca preditiva","settings":[]}
+{% endschema %}

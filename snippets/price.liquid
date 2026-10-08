@@ -1,0 +1,37 @@
+{% doc %}
+  Renders a localized product or variant price with optional purchase plan pricing.
+  @param {product} product - The product to display.
+  @param {variant} [variant] - The selected variant, when showing a specific price.
+  @param {selling_plan_allocation} [allocation] - An optional selected purchase plan allocation.
+{% enddoc %}
+{%- liquid
+  assign price_value = product.price
+  assign compare_value = product.compare_at_price
+  assign show_from = product.price_varies
+  assign unit_variant = product.selected_or_first_available_variant
+  if variant != blank
+    assign price_value = variant.price
+    assign compare_value = variant.compare_at_price
+    assign show_from = false
+    assign unit_variant = variant
+  endif
+  assign unit_price_value = unit_variant.unit_price
+  if allocation != blank
+    assign price_value = allocation.price
+    assign compare_value = allocation.compare_at_price
+    assign unit_price_value = allocation.unit_price
+  endif
+-%}
+<div class="price{% if compare_value > price_value and show_from == false %} price--sale{% endif %}">
+  <span class="price__current">
+    <span class="visually-hidden">{{ 'products.general.price' | t }}</span>
+    {% if show_from %}{{ 'products.general.from' | t }} {% endif %}
+    {% if settings.show_currency_code %}{{ price_value | money_with_currency }}{% else %}{{ price_value | money }}{% endif %}
+  </span>
+  {% if compare_value > price_value and show_from == false %}
+    <s class="price__compare"><span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>{{ compare_value | money }}</s>
+  {% endif %}
+  {% if unit_variant.unit_price_measurement != blank and unit_price_value != blank and show_from == false %}
+    <small class="price__unit">{{ unit_price_value | money }} / {% if unit_variant.unit_price_measurement.reference_value != 1 %}{{ unit_variant.unit_price_measurement.reference_value }}{% endif %}{{ unit_variant.unit_price_measurement.reference_unit }}</small>
+  {% endif %}
+</div>

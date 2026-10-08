@@ -1,0 +1,33 @@
+<section class="section search-page" style="--grid-desktop: {{ section.settings.columns }}; --grid-mobile: 2">
+  <div class="container">
+    <div class="search-page__heading"><h1 class="section-heading">{{ 'catalog.search.title' | t }}</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-page__form">
+        <label for="PageSearch-{{ section.id }}" class="visually-hidden">{{ 'catalog.search.placeholder' | t }}</label>
+        <input id="PageSearch-{{ section.id }}" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'catalog.search.placeholder' | t }}" required>
+        <input type="hidden" name="options[prefix]" value="last"><input type="hidden" name="type" value="{% if search.types.size > 0 %}{{ search.types | join: ',' | escape }}{% else %}product,article,page{% endif %}">
+        <button type="submit" class="button">{{ 'catalog.search.submit' | t }}</button>
+      </form>
+    </div>
+    {% if search.performed %}
+      {% paginate search.results by section.settings.results_per_page %}
+        {% assign escaped_terms = search.terms | escape %}<p class="catalog-count muted">{{ 'catalog.search.results' | t: count: search.results_count, terms: escaped_terms }}</p>
+        {% render 'facets', results: search, section_id: section.id, enable_filtering: section.settings.enable_filtering, enable_sorting: section.settings.enable_sorting %}
+        {% if search.results_count > 0 %}
+          <div class="product-grid catalog-grid">
+            {% for result in search.results %}
+              {% case result.object_type %}
+                {% when 'product' %}{% render 'product-card', product: result, section_id: section.id %}
+                {% when 'article' %}{% render 'article-card', article: result, show_date: true, show_excerpt: true %}
+                {% else %}<article class="search-page-card"><p class="eyebrow muted">{{ 'catalog.search.page' | t }}</p><h2><a href="{{ result.url }}">{{ result.title | escape }}</a></h2><p class="muted">{{ result.content | strip_html | truncate: 180 }}</p><a href="{{ result.url }}" class="text-link">{{ 'secondary.read_more' | t }} →</a></article>
+              {% endcase %}
+            {% endfor %}
+          </div>
+        {% else %}<div class="empty-state"><h2>{{ 'catalog.search.no_results' | t }}</h2><p class="muted">{{ 'catalog.search.try_again' | t }}</p><a href="{{ routes.all_products_collection_url }}" class="button button--secondary">{{ 'catalog.continue_shopping' | t }}</a></div>{% endif %}
+        {% render 'pagination', paginate: paginate %}
+      {% endpaginate %}
+    {% endif %}
+  </div>
+</section>
+{% schema %}
+{"name":"Busca","settings":[{"type":"checkbox","id":"enable_filtering","label":"Ativar filtros","default":true},{"type":"checkbox","id":"enable_sorting","label":"Ativar ordenação","default":true},{"type":"range","id":"results_per_page","label":"Resultados por página","min":12,"max":48,"step":12,"default":24},{"type":"range","id":"columns","label":"Colunas no computador","min":2,"max":5,"step":1,"default":4}]}
+{% endschema %}

@@ -1,0 +1,29 @@
+{
+  "type": "footer",
+  "name": "Rodapé",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "background": "#f5f6f4",
+        "padding_top": 64,
+        "padding_bottom": 32
+      },
+      "blocks": {
+        "menu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Explore",
+            "menu": "footer"
+          }
+        }
+      },
+      "block_order": [
+        "menu"
+      ]
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

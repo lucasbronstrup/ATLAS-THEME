@@ -1,0 +1,171 @@
+{{ 'visual-sections.css' | asset_url | stylesheet_tag }}
+<div class="section atlas-visual-section" style="{% if section.settings.spacing > 0 %}--visual-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--visual-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}"><div class="container">{% if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.text != blank %}<div class="section-heading"><div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}{% if section.settings.heading != blank %}<h2>{{ section.settings.heading | escape }}</h2>{% endif %}{% if section.settings.text != blank %}<div class="rte muted">{{ section.settings.text }}</div>{% endif %}</div></div>{% endif %}<div class="atlas-promotion-mosaic atlas-promotion-mosaic--{{ section.blocks.size }}">
+{% for block in section.blocks %}{% assign destination = block.settings.link | default: block.settings.collection.url %}<article class="atlas-promotion-card atlas-visual-card{% if forloop.first %} atlas-promotion-card--large{% endif %}" style="--promotion-bg:{{ block.settings.background }};--promotion-ink:{{ block.settings.text_color }}" {{ block.shopify_attributes }}>
+<div class="atlas-promotion-card__media atlas-visual-media">{% assign campaign_image = block.settings.image | default: block.settings.collection.featured_image %}{% if campaign_image %}{{ campaign_image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '300,500,700,1000,1400', sizes: '(min-width: 990px) 50vw, 100vw', alt: block.settings.image_alt }}{% else %}{{ 'collection-1' | placeholder_svg_tag: 'atlas-promotion-card__placeholder' }}{% endif %}</div>
+<div class="atlas-promotion-card__copy">{% if block.settings.eyebrow != blank %}<p class="eyebrow">{{ block.settings.eyebrow | escape }}</p>{% endif %}<h3>{{ block.settings.heading | default: block.settings.collection.title | escape }}</h3>{% if block.settings.text != blank %}<p>{{ block.settings.text | escape }}</p>{% endif %}{% if destination != blank and block.settings.button_label != blank %}<a class="button button--secondary" href="{{ destination }}">{{ block.settings.button_label | escape }}{% render 'icon', name: 'arrow' %}</a>{% endif %}</div>
+</article>{% endfor %}</div></div></div>
+{% schema %}
+{
+  "tag": "section",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  },
+  "name": "Mosaico de promoções",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Texto de apoio"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Descrição"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Espaço no computador (0 usa o tema)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Espaço no celular (0 usa o tema)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Fundo (vazio usa o tema)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texto (vazio usa o tema)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "campaign",
+      "name": "Campanha",
+      "settings": [
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Texto de apoio"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Descrição"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagem"
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Descrição acessível da imagem"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Coleção (opcional)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto do botão",
+          "default": "Explorar"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Fundo do cartão",
+          "default": "#eff1eb"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Cor do texto",
+          "default": "#172229"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mosaico de promoções",
+      "settings": {
+        "heading": "Escolhas para cada momento."
+      },
+      "blocks": [
+        {
+          "type": "campaign",
+          "settings": {
+            "eyebrow": "EM DESTAQUE",
+            "heading": "Uma nova perspectiva.",
+            "text": "Dê espaço aos seus próximos favoritos."
+          }
+        },
+        {
+          "type": "campaign",
+          "settings": {
+            "heading": "Para o seu dia",
+            "background": "#e8ede4"
+          }
+        },
+        {
+          "type": "campaign",
+          "settings": {
+            "heading": "Detalhes que inspiram",
+            "background": "#ede8df"
+          }
+        },
+        {
+          "type": "campaign",
+          "settings": {
+            "heading": "Seleção da loja",
+            "background": "#e5eaed"
+          }
+        },
+        {
+          "type": "campaign",
+          "settings": {
+            "heading": "Novas possibilidades",
+            "background": "#ece8ef"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

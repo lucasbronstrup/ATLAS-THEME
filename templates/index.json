@@ -1,0 +1,358 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "background": "#f0f2ed",
+        "padding_top": 0,
+        "padding_bottom": 0
+      },
+      "blocks": {
+        "slide": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "CURADORIA PARA O SEU DIA",
+            "heading": "O essencial.\nCom uma nova perspectiva.",
+            "text": "<p>Escolhas que combinam com você. Descubra nossa seleção de novidades.</p>",
+            "button_label": "Explore a coleção",
+            "link": "shopify://collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "slide"
+      ]
+    },
+    "collections": {
+      "type": "collection-list",
+      "settings": {
+        "heading": "Encontre o seu próximo favorito.",
+        "eyebrow": "EXPLORE AS COLEÇÕES",
+        "columns": 4
+      },
+      "blocks": {
+        "a": {
+          "type": "collection",
+          "settings": {
+            "heading": "Novidades"
+          }
+        },
+        "b": {
+          "type": "collection",
+          "settings": {
+            "heading": "Essenciais"
+          }
+        },
+        "c": {
+          "type": "collection",
+          "settings": {
+            "heading": "Seleção especial"
+          }
+        },
+        "d": {
+          "type": "collection",
+          "settings": {
+            "heading": "Todos os produtos"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Uma seleção para você",
+        "eyebrow": "EM DESTAQUE",
+        "link": "shopify://collections/all",
+        "link_label": "Ver todos",
+        "limit": 8,
+        "columns": 4
+      }
+    },
+    "blogposts": {
+      "type": "featured-blog",
+      "settings": {
+        "eyebrow": "LEITURAS PARA VOCÊ",
+        "heading": "Posts do blog",
+        "text": "<p>Ideias, histórias e conteúdos da nossa loja.</p>",
+        "limit": 3,
+        "layout": "grid",
+        "columns": 3,
+        "mobile_columns": "1",
+        "carousel_mobile_columns": "1.5",
+        "show_image": true,
+        "show_title": true,
+        "show_excerpt": true,
+        "show_date": true,
+        "show_author": false,
+        "show_read_more": true,
+        "show_view_all": true,
+        "link_label": "Ver todos os posts"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Novidades que valem a pena.",
+        "text": "<p>Receba lançamentos e conteúdos da nossa loja.</p>",
+        "background": "#ddf38b",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "carousel": {
+      "type": "product-carousel",
+      "settings": {
+        "heading": "Continue explorando",
+        "collection": "all",
+        "limit": 8,
+        "columns": 4,
+        "mobile_columns": "1.5",
+        "exclude_current": false,
+        "show_view_all": true
+      }
+    },
+    "mosaic": {
+      "type": "promotion-mosaic",
+      "settings": {
+        "heading": "Escolhas para cada momento."
+      },
+      "blocks": {
+        "item-1": {
+          "type": "campaign",
+          "settings": {
+            "eyebrow": "EM DESTAQUE",
+            "heading": "Uma nova perspectiva.",
+            "text": "Dê espaço aos seus próximos favoritos.",
+            "collection": "all",
+            "link": "shopify://collections/all",
+            "button_label": "Explore",
+            "image_alt": "Seleção 1"
+          }
+        },
+        "item-2": {
+          "type": "campaign",
+          "settings": {
+            "heading": "Para o seu dia",
+            "background": "#e8ede4",
+            "collection": "all",
+            "link": "shopify://collections/all",
+            "button_label": "Explore",
+            "image_alt": "Seleção 2"
+          }
+        },
+        "item-3": {
+          "type": "campaign",
+          "settings": {
+            "heading": "Detalhes que inspiram",
+            "background": "#ede8df",
+            "collection": "all",
+            "link": "shopify://collections/all",
+            "button_label": "Explore",
+            "image_alt": "Seleção 3"
+          }
+        },
+        "item-4": {
+          "type": "campaign",
+          "settings": {
+            "heading": "Seleção da loja",
+            "background": "#e5eaed",
+            "collection": "all",
+            "link": "shopify://collections/all",
+            "button_label": "Explore",
+            "image_alt": "Seleção 4"
+          }
+        },
+        "item-5": {
+          "type": "campaign",
+          "settings": {
+            "heading": "Novas possibilidades",
+            "background": "#ece8ef",
+            "collection": "all",
+            "link": "shopify://collections/all",
+            "button_label": "Explore",
+            "image_alt": "Seleção 5"
+          }
+        }
+      },
+      "block_order": [
+        "item-1",
+        "item-2",
+        "item-3",
+        "item-4",
+        "item-5"
+      ]
+    },
+    "offers": {
+      "type": "offer-cards",
+      "settings": {
+        "heading": "Escolhas da nossa loja",
+        "columns": 4
+      },
+      "blocks": {
+        "item-1": {
+          "type": "offer",
+          "settings": {
+            "heading": "Escolhas da temporada",
+            "text": "Encontre os detalhes que combinam com você.",
+            "link": "shopify://collections/all",
+            "button_label": "Explore"
+          }
+        },
+        "item-2": {
+          "type": "offer",
+          "settings": {
+            "heading": "Essenciais do dia",
+            "text": "Descubra a seleção da nossa loja.",
+            "link": "shopify://collections/all",
+            "button_label": "Explore"
+          }
+        },
+        "item-3": {
+          "type": "offer",
+          "settings": {
+            "heading": "Novas ideias",
+            "text": "Explore outras possibilidades.",
+            "link": "shopify://collections/all",
+            "button_label": "Explore"
+          }
+        },
+        "item-4": {
+          "type": "offer",
+          "settings": {
+            "heading": "Outras possibilidades",
+            "text": "Encontre o seu próximo favorito.",
+            "link": "shopify://collections/all",
+            "button_label": "Explore"
+          }
+        }
+      },
+      "block_order": [
+        "item-1",
+        "item-2",
+        "item-3",
+        "item-4"
+      ]
+    },
+    "beforeafter": {
+      "type": "before-after",
+      "settings": {
+        "heading": "Uma imagem. Duas perspectivas.",
+        "text": "<p>Explore o comparativo visual.</p>"
+      }
+    },
+    "overlay": {
+      "type": "overlay-banner",
+      "settings": {
+        "eyebrow": "NOVAS POSSIBILIDADES",
+        "heading": "Detalhes que fazem parte do seu dia.",
+        "text": "<p>Uma seleção de detalhes para o seu dia.</p>",
+        "link": "shopify://collections/all",
+        "button_label": "Conheça a coleção",
+        "alignment": "left"
+      }
+    },
+    "services": {
+      "type": "service-links",
+      "settings": {
+        "heading": "Como podemos ajudar?"
+      },
+      "blocks": {
+        "item-1": {
+          "type": "service",
+          "settings": {
+            "icon": "chat",
+            "heading": "Atendimento",
+            "text": "Conheça os nossos canais de contato."
+          }
+        },
+        "item-2": {
+          "type": "service",
+          "settings": {
+            "icon": "truck",
+            "heading": "Seu pedido",
+            "text": "Veja os detalhes dos seus pedidos na sua conta.",
+            "use_account": true,
+            "button_label": "Acessar conta"
+          }
+        },
+        "item-3": {
+          "type": "service",
+          "settings": {
+            "icon": "return",
+            "heading": "Trocas e devoluções",
+            "text": "Consulte as condições da loja."
+          }
+        },
+        "item-4": {
+          "type": "service",
+          "settings": {
+            "icon": "shield",
+            "heading": "Informações de compra",
+            "text": "Encontre as nossas políticas e condições."
+          }
+        }
+      },
+      "block_order": [
+        "item-1",
+        "item-2",
+        "item-3",
+        "item-4"
+      ]
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "heading": "Perguntas frequentes",
+        "text": "<p>Informações para facilitar a sua escolha.</p>"
+      },
+      "blocks": {
+        "variants": {
+          "type": "question",
+          "settings": {
+            "question": "Como escolho as opções de um produto?",
+            "answer": "<p>Na página do produto, selecione as opções disponíveis antes de adicionar o item ao carrinho. O preço e a disponibilidade acompanham a sua seleção.</p>"
+          }
+        },
+        "delivery": {
+          "type": "question",
+          "settings": {
+            "question": "Onde consulto as opções de entrega?",
+            "answer": "<p>Veja as opções de frete no checkout e consulte a política de entrega da loja para informações adicionais.</p>"
+          }
+        },
+        "orders": {
+          "type": "question",
+          "settings": {
+            "question": "Como consulto as informações do meu pedido?",
+            "answer": "<p>Use as informações enviadas pela loja após a compra. Se a loja disponibilizar contas de cliente, seus pedidos também podem ser consultados na sua conta.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "variants",
+        "delivery",
+        "orders"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "collections",
+    "featured",
+    "mosaic",
+    "carousel",
+    "offers",
+    "beforeafter",
+    "overlay",
+    "services",
+    "faq",
+    "blogposts",
+    "newsletter"
+  ]
+}

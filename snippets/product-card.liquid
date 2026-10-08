@@ -1,0 +1,49 @@
+{% doc %}
+  Renders a product card with responsive images and a native quick purchase form.
+  @param {product} product - The product to display.
+  @param {string} [section_id] - The parent section identifier.
+{% enddoc %}
+{%- liquid
+  assign card_variant = product.selected_or_first_available_variant
+  assign card_form_id = 'CardForm-' | append: section_id | append: '-' | append: product.id
+  assign image_ratio = settings.card_image_ratio | default: 'square'
+-%}
+<article class="product-card product-card--{{ image_ratio }}">
+  <a class="product-card__media" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {% if product.featured_image %}
+      {{ product.featured_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '180, 280, 360, 480, 600, 900', sizes: '(min-width: 1200px) 25vw, (min-width: 750px) 33vw, 50vw', class: 'product-card__image' }}
+      {% if settings.show_secondary_image and product.images[1] != blank %}
+        {{ product.images[1] | image_url: width: 900 | image_tag: loading: 'lazy', widths: '180, 280, 360, 480, 600, 900', sizes: '(min-width: 1200px) 25vw, (min-width: 750px) 33vw, 50vw', class: 'product-card__image product-card__image--secondary' }}
+      {% endif %}
+    {% else %}
+      {{ 'product-1' | placeholder_svg_tag: 'product-card__placeholder' }}
+    {% endif %}
+    {% unless product.available %}
+      <span class="product-card__badge product-card__badge--soldout">{{ 'products.general.sold_out' | t }}</span>
+    {% else %}
+      {% if product.compare_at_price > product.price and product.price_varies == false %}
+        <span class="product-card__badge">{{ 'products.general.sale' | t }}</span>
+      {% endif %}
+    {% endunless %}
+  </a>
+  <div class="product-card__body">
+    {% if settings.show_vendor and product.vendor != blank %}<p class="product-card__vendor muted">{{ product.vendor | escape }}</p>{% endif %}
+    <h3 class="product-card__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+    {% render 'price', product: product %}
+    {% if settings.show_stock and product.variants_count == 1 and card_variant.inventory_management == 'shopify' and card_variant.inventory_policy == 'deny' and card_variant.inventory_quantity > 0 and card_variant.inventory_quantity <= settings.stock_threshold %}<p class="product-card__stock muted">{{ 'products.general.inventory_count' | t: count: card_variant.inventory_quantity }}</p>{% endif %}
+    {% if settings.quick_add %}
+      {% if product.variants_count == 1 and product.requires_selling_plan == false %}
+        {% form 'product', product, id: card_form_id, class: 'product-card__form', data-product-form: '' %}
+          <input type="hidden" name="id" value="{{ card_variant.id }}">
+          <input type="hidden" name="quantity" value="{{ card_variant.quantity_rule.min | default: 1 }}">
+          <p class="product-form__error" data-form-error role="alert" hidden></p>
+          <button class="button button--secondary product-card__add" type="submit" name="add" data-add-button aria-label="{% if card_variant.available %}{{ 'products.general.add_to_cart' | t }}{% else %}{{ 'products.general.sold_out' | t }}{% endif %}: {{ product.title | escape }}" {% unless card_variant.available %}disabled{% endunless %}>
+            {% if card_variant.available %}{{ 'products.general.quick_add' | t }} <span aria-hidden="true">+</span>{% else %}{{ 'products.general.sold_out' | t }}{% endif %}
+          </button>
+        {% endform %}
+      {% else %}
+        <a class="button button--secondary product-card__add" href="{{ product.url }}" aria-label="{{ 'products.general.choose_options' | t }}: {{ product.title | escape }}">{{ 'products.general.choose_options' | t }} <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    {% endif %}
+  </div>
+</article>

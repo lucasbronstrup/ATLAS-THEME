@@ -1,0 +1,55 @@
+{% doc %}
+  Renders accessible product option values with native high-variant and combined listing support.
+  @param {product} product - The product whose options are displayed.
+  @param {block} block - The variant picker block and its editable settings.
+  @param {string} section_id - The parent product section identifier.
+{% enddoc %}
+{% unless product.has_only_default_variant %}
+                {% for option in product.options_with_values %}
+                  {% liquid
+                    assign use_variant_images = false
+                    if block.settings.picker_type == 'images'
+                      if block.settings.image_option_name == blank and option.position == 1
+                        assign use_variant_images = true
+                      elsif block.settings.image_option_name != blank
+                        assign image_option_name = block.settings.image_option_name | strip | downcase
+                        assign current_option_name = option.name | strip | downcase
+                        if image_option_name == current_option_name
+                          assign use_variant_images = true
+                        endif
+                      endif
+                    endif
+                  %}
+                  <fieldset class="product-option"><legend>{{ option.name | escape }}</legend>
+                    {% if block.settings.picker_type == 'dropdown' %}
+                      <select class="product-option__select" data-option-select aria-label="{{ option.name | escape }}">
+                        {% for value in option.values %}<option value="{{ value.id }}" data-product-url="{{ value.product_url }}" {% if value.selected %}selected{% endif %}>{{ value.name | escape }}{% unless value.available %} — {{ 'products.general.sold_out' | t }}{% endunless %}</option>{% endfor %}
+                      </select>
+                    {% else %}
+                      <div class="product-option__values">
+                        {% for value in option.values %}
+                          {% assign option_image = value.variant.featured_media.preview_image | default: value.swatch.image %}
+                          {% capture input_id %}Option-{{ section_id }}-{{ option.position }}-{{ value.id }}{% endcapture %}
+                          <input class="product-option__input visually-hidden" type="radio" id="{{ input_id }}" name="Option-{{ section_id }}-{{ option.position }}" value="{{ value.id }}" data-option-input data-option-value-id="{{ value.id }}" data-product-url="{{ value.product_url }}" {% if value.selected %}checked{% endif %}>
+                          <label class="product-option__label{% if use_variant_images and option_image != blank %} product-option__label--image{% endif %}{% unless value.available %} product-option__label--unavailable{% endunless %}" for="{{ input_id }}">
+                            {% if use_variant_images and option_image != blank %}
+                              {{ option_image | image_url: width: 168 | image_tag: loading: 'lazy', widths: '56, 112, 168', sizes: '72px', class: 'product-option__image', alt: '' }}
+                            {% elsif block.settings.show_swatches and value.swatch != blank %}
+                              <span class="product-option__swatch" {% if value.swatch.color %}style="--swatch: {{ value.swatch.color }}"{% endif %}>
+                                {% if value.swatch.image %}{{ value.swatch.image | image_url: width: 60 | image_tag: loading: 'lazy', widths: '30, 60', sizes: '24px', alt: '' }}{% endif %}
+                              </span>
+                            {% endif %}
+                            <span>{{ value.name | escape }}</span>{% unless value.available %}<span class="visually-hidden"> — {{ 'products.general.sold_out' | t }}</span>{% endunless %}
+                          </label>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                    <noscript><div class="product-option__fallback">
+                      {% for value in option.values %}
+                        {% capture selected_values %}{% for other_option in product.options_with_values %}{% unless forloop.first %},{% endunless %}{% if other_option.position == option.position %}{{ value.id }}{% else %}{% assign selected_value = other_option.values | where: 'selected', true | first %}{{ selected_value.id }}{% endif %}{% endfor %}{% endcapture %}
+                        <a href="{{ value.product_url | default: product.url }}?option_values={{ selected_values | strip }}" {% if value.selected %}aria-current="true"{% endif %}>{{ value.name | escape }}</a>
+                      {% endfor %}
+                    </div></noscript>
+                  </fieldset>
+                {% endfor %}
+              {% endunless %}

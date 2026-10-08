@@ -1,0 +1,17 @@
+<section class="section cart-page" data-main-cart data-section-id="{{ section.id }}">
+  <div class="container">
+    <div class="cart-page__heading"><h1 class="section-heading">{{ 'catalog.cart.title' | t }}</h1><a href="{{ routes.all_products_collection_url }}" class="text-link">{{ 'catalog.continue_shopping' | t }} →</a></div>
+    {% if cart.item_count == 0 %}
+      <div class="empty-state"><div class="empty-state__icon">{% render 'icon', name: 'bag' %}</div><h2>{{ 'catalog.cart.empty' | t }}</h2><p class="muted">{{ 'catalog.cart.empty_text' | t }}</p><a href="{{ routes.all_products_collection_url }}" class="button">{{ 'catalog.continue_shopping' | t }}</a></div>
+    {% else %}
+      {% assign cart_form_id = 'CartForm-' | append: section.id %}
+      <div class="cart-page__layout">
+        <form action="{{ routes.cart_url }}" method="post" id="{{ cart_form_id }}" class="cart-page__items"><div class="cart-column-heading"><span>{{ 'catalog.cart.product' | t }}</span><span>{{ 'catalog.cart.total' | t }}</span></div>{% for item in cart.items %}{% render 'cart-line-item', item: item, context: section.id %}{% endfor %}<button type="submit" name="update" class="button button--secondary cart-update">{{ 'catalog.cart.update' | t }}</button></form>
+        <aside class="cart-page__summary"><h2>{{ 'catalog.cart.summary' | t }}</h2>{% render 'cart-upsells', context: section.id %}{% render 'cart-summary', context: section.id, form_id: cart_form_id, show_note: section.settings.show_note, show_accelerated: section.settings.show_accelerated %}{% if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 %}<ul class="payment-icons" role="list" aria-label="{{ 'catalog.cart.payment_methods' | t }}">{% for type in shop.enabled_payment_types %}<li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>{% endfor %}</ul>{% endif %}</aside>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% schema %}
+{"name":"Carrinho","settings":[{"type":"checkbox","id":"show_note","label":"Permitir observação do pedido","default":true},{"type":"checkbox","id":"show_payment_icons","label":"Mostrar meios de pagamento ativos","default":true},{"type":"checkbox","id":"show_accelerated","label":"Mostrar checkout acelerado","default":false}]}
+{% endschema %}

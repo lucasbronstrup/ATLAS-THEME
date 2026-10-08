@@ -1,0 +1,24 @@
+<section class="section"><div class="{% if section.settings.container %}container{% endif %}">{% for block in section.blocks %}{% render block %}{% endfor %}</div></section>
+{% schema %}
+{
+  "name": "Aplicativos",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "container",
+      "label": "Limitar largura",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Aplicativos"
+    }
+  ]
+}
+{% endschema %}

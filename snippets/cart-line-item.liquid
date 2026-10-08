@@ -1,0 +1,32 @@
+{% doc %}
+  Renders a Shopify cart line including selling plans, custom properties and discounts.
+  @param {line_item} item - Cart line item
+  @param {string} context - Unique identifier for quantity fields
+  @example
+  {% render 'cart-line-item', item: item, context: section.id %}
+{% enddoc %}
+{% assign line_dom_id = item.key | handleize %}
+<div class="cart-item" data-cart-item="{{ item.key | escape }}">
+  <a class="cart-item__image" href="{{ item.url }}" tabindex="-1" aria-hidden="true">{% if item.image %}{{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '100, 160, 240', sizes: '100px' }}{% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}</a>
+  <div class="cart-item__details">
+    <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title | escape }}</a>
+    {% unless item.product.has_only_default_variant %}<p class="muted cart-item__variant">{{ item.variant.title | escape }}</p>{% endunless %}
+    {% if item.selling_plan_allocation %}<p class="muted cart-item__variant">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>{% endif %}
+    {% if item.properties.size > 0 %}
+      <dl class="cart-item__properties">{% for property in item.properties %}{% assign property_first_char = property.first | slice: 0 %}{% if property.last != blank and property_first_char != '_' %}<div><dt>{{ property.first | escape }}:</dt><dd>{% if property.last contains '/uploads/' %}<a href="{{ property.last }}" target="_blank" rel="noopener">{{ property.last | split: '/' | last | escape }}</a>{% else %}{{ property.last | escape }}{% endif %}</dd></div>{% endif %}{% endfor %}</dl>
+    {% endif %}
+    {% if item.item_components.size > 0 %}<ul class="cart-item__components" role="list">{% for component in item.item_components %}<li>{{ component.quantity }} × {{ component.title | escape }}</li>{% endfor %}</ul>{% endif %}
+    <div class="cart-item__price">
+      {% if item.original_price != item.final_price %}<s class="muted">{{ item.original_price | money }}</s>{% endif %}<span>{{ item.final_price | money }}</span>
+      {% if item.unit_price_measurement %}<small class="muted">{{ item.unit_price | money }}/ {% if item.unit_price_measurement.reference_value != 1 %}{{ item.unit_price_measurement.reference_value }}{% endif %}{{ item.unit_price_measurement.reference_unit }}</small>{% endif %}
+    </div>
+    {% if item.line_level_discount_allocations.size > 0 %}<ul class="cart-discounts" role="list">{% for allocation in item.line_level_discount_allocations %}<li>{{ allocation.discount_application.title | escape }} (−{{ allocation.amount | money }})</li>{% endfor %}</ul>{% endif %}
+    <div class="cart-item__actions">
+      <label class="visually-hidden" for="Quantity-{{ context }}-{{ line_dom_id }}">{{ 'catalog.cart.quantity_for' | t: title: item.product.title | escape }}</label>
+      <input id="Quantity-{{ context }}-{{ line_dom_id }}" class="cart-item__quantity" type="number" name="updates[]" value="{{ item.quantity }}" min="{{ item.variant.quantity_rule.min | default: 1 }}" step="{{ item.variant.quantity_rule.increment | default: 1 }}" {% if item.variant.quantity_rule.max %}max="{{ item.variant.quantity_rule.max }}"{% endif %} inputmode="numeric" data-cart-change data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.quantity_for' | t: title: item.product.title | escape }}">
+      <a href="{{ item.url_to_remove }}" class="text-link cart-item__remove" data-remove-line="{{ item.key | escape }}" data-line-key="{{ item.key | escape }}" aria-label="{{ 'catalog.cart.remove_for' | t: title: item.product.title | escape }}">{{ 'catalog.cart.remove' | t }}</a>
+    </div>
+    {% if item.error_message != blank %}<p class="form-error" role="alert">{{ item.error_message | escape }}</p>{% endif %}
+  </div>
+  <div class="cart-item__total">{% if item.original_line_price != item.final_line_price %}<s class="muted">{{ item.original_line_price | money }}</s>{% endif %}<strong>{{ item.final_line_price | money }}</strong></div>
+</div>

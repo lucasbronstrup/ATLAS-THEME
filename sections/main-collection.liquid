@@ -1,0 +1,36 @@
+{% if section.settings.layout == 'carousel' %}
+  {{ 'product-carousel.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
+{% endif %}
+<section class="section collection-page{% if section.settings.layout == 'carousel' %} atlas-product-row{% endif %}" {% if section.settings.layout == 'carousel' %}data-product-carousel data-carousel-status-format="{{ 'products.carousel.position' | t: current: '{current}', total: '{total}' | escape }}"{% endif %} style="--grid-desktop: {{ section.settings.columns }}; --grid-mobile: {{ section.settings.mobile_columns }}; --carousel-columns: {{ section.settings.columns }}; --carousel-mobile-columns: {{ section.settings.carousel_mobile_columns }}">
+  <div class="container">
+    <div class="collection-header{% if section.settings.show_image and collection.image %} collection-header--image{% endif %}">
+      <div><h1 class="section-heading" id="CollectionHeading-{{ section.id }}">{{ collection.title | escape }}</h1>{% if section.settings.show_description and collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+      {% if section.settings.show_image and collection.image %}{{ collection.image | image_url: width: 1000 | image_tag: widths: '360, 600, 800, 1000', sizes: '(min-width: 800px) 40vw, 100vw', class: 'collection-header__image', loading: 'eager' }}{% endif %}
+    </div>
+    {% paginate collection.products by section.settings.products_per_page %}
+      <div class="catalog-count muted">{{ 'catalog.products_count' | t: count: collection.products_count }}</div>
+      {% render 'facets', results: collection, section_id: section.id, enable_filtering: section.settings.enable_filtering, enable_sorting: section.settings.enable_sorting %}
+      {% if collection.products.size > 0 %}
+        {% if section.settings.layout == 'carousel' %}
+          <div class="collection-carousel-actions">
+            <div class="atlas-carousel-controls" data-carousel-controls hidden>
+              <button class="icon-button" type="button" data-carousel-prev aria-label="{{ 'products.carousel.previous' | t }}" aria-controls="CollectionTrack-{{ section.id }}" disabled>{% render 'icon', name: 'arrow' %}</button>
+              <button class="icon-button" type="button" data-carousel-next aria-label="{{ 'products.carousel.next' | t }}" aria-controls="CollectionTrack-{{ section.id }}">{% render 'icon', name: 'arrow' %}</button>
+            </div>
+          </div>
+          <div class="atlas-carousel-track collection-carousel-track" id="CollectionTrack-{{ section.id }}" data-carousel-track tabindex="0" role="region" aria-labelledby="CollectionHeading-{{ section.id }}">{% for product in collection.products %}<div class="atlas-carousel-cell">{% render 'product-card', product: product, section_id: section.id %}</div>{% endfor %}</div>
+          <span class="visually-hidden" data-carousel-status aria-live="polite" aria-atomic="true"></span>
+        {% else %}
+          <div class="product-grid catalog-grid">{% for product in collection.products %}{% render 'product-card', product: product, section_id: section.id %}{% endfor %}</div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state"><h2>{{ 'catalog.empty_title' | t }}</h2><p class="muted">{{ 'catalog.empty_filters' | t }}</p><a href="{{ collection.url }}" class="button button--secondary">{{ 'catalog.filters.clear' | t }}</a></div>
+      {% endif %}
+      {% render 'pagination', paginate: paginate %}
+    {% endpaginate %}
+  </div>
+</section>
+{% schema %}
+{"name":"Coleção","settings":[{"type":"checkbox","id":"show_description","label":"Mostrar descrição","default":true},{"type":"checkbox","id":"show_image","label":"Mostrar imagem da coleção","default":false},{"type":"checkbox","id":"enable_filtering","label":"Ativar filtros","default":true,"info":"Configure os filtros no app Shopify Search & Discovery."},{"type":"checkbox","id":"enable_sorting","label":"Ativar ordenação","default":true},{"type":"select","id":"layout","label":"Exibição dos produtos","options":[{"value":"grid","label":"Grade"},{"value":"carousel","label":"Carrossel"}],"default":"grid","info":"O carrossel mantém os filtros e a paginação da coleção."},{"type":"range","id":"products_per_page","label":"Produtos por página","min":12,"max":48,"step":12,"default":24},{"type":"range","id":"columns","label":"Produtos visíveis no computador","min":2,"max":5,"step":1,"default":4},{"type":"select","id":"mobile_columns","label":"Colunas da grade no celular","options":[{"value":"1","label":"1"},{"value":"2","label":"2"}],"default":"2"},{"type":"select","id":"carousel_mobile_columns","label":"Produtos visíveis no carrossel no celular","options":[{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],"default":"1.5"}]}
+{% endschema %}

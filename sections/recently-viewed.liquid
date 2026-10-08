@@ -1,0 +1,42 @@
+{{ 'product-carousel.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-carousel.js' | asset_url }}" defer></script>
+<script src="{{ 'recently-viewed.js' | asset_url }}" defer></script>
+<div class="section atlas-product-row" data-recently-viewed data-product-carousel data-current-handle="{{ product.handle | escape }}" data-root="{{ routes.root_url }}" data-limit="{{ section.settings.limit }}" data-design-mode="{{ request.design_mode }}" data-carousel-status-format="{{ 'products.carousel.position' | t: current: '{current}', total: '{total}' | escape }}" style="--carousel-columns:{{ section.settings.columns }};--carousel-mobile-columns:{{ section.settings.mobile_columns }};{% if section.settings.spacing > 0 %}--row-space:{{ section.settings.spacing }}px;{% endif %}{% if section.settings.mobile_spacing > 0 %}--row-space-mobile:{{ section.settings.mobile_spacing }}px;{% endif %}{% if section.settings.background != blank %}--section-bg:{{ section.settings.background }};--background:{{ section.settings.background }};{% endif %}{% if section.settings.text_color != blank %}--section-ink:{{ section.settings.text_color }};--ink:{{ section.settings.text_color }};{% endif %}" {% unless request.design_mode %}hidden{% endunless %}>
+  <div class="container">
+    <div class="section-heading">
+      <div>{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}<h2 id="RecentHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2></div>
+      <div class="atlas-product-row__actions">
+        {% if section.settings.show_clear %}<button class="atlas-recent-clear" type="button" data-recent-clear hidden>{{ 'products.recent.clear' | t }}</button>{% endif %}
+        <div class="atlas-carousel-controls" data-carousel-controls hidden>
+          <button class="icon-button" type="button" data-carousel-prev aria-label="{{ 'products.carousel.previous' | t }}" aria-controls="RecentTrack-{{ section.id }}" disabled>{% render 'icon', name: 'arrow' %}</button>
+          <button class="icon-button" type="button" data-carousel-next aria-label="{{ 'products.carousel.next' | t }}" aria-controls="RecentTrack-{{ section.id }}">{% render 'icon', name: 'arrow' %}</button>
+        </div>
+      </div>
+    </div>
+    <div class="atlas-carousel-track" id="RecentTrack-{{ section.id }}" data-carousel-track tabindex="0" role="region" aria-labelledby="RecentHeading-{{ section.id }}"></div>
+    <span class="visually-hidden" data-carousel-status aria-live="polite" aria-atomic="true"></span>
+    {% if request.design_mode %}<p class="atlas-product-row__empty" data-recent-editor>{{ 'products.recent.editor_empty' | t }}</p>{% endif %}
+  </div>
+  <template data-recent-product-card>{% if product != blank %}{% render 'product-card', product: product, section_id: section.id %}{% endif %}</template>
+</div>
+{% schema %}
+{
+  "name":"Visto recentemente",
+  "tag":"section",
+  "disabled_on":{"groups":["header","footer"]},
+  "settings":[
+    {"type":"paragraph","content":"Histórico apenas neste navegador, por até 30 dias. Respeita a permissão de preferências da Shopify. Sem histórico, a seção fica oculta na loja."},
+    {"type":"text","id":"eyebrow","label":"Texto de apoio"},
+    {"type":"text","id":"heading","label":"Título","default":"Visto recentemente"},
+    {"type":"checkbox","id":"show_clear","label":"Mostrar botão para limpar histórico","default":true},
+    {"type":"range","id":"limit","label":"Quantidade de produtos","min":2,"max":10,"step":1,"default":8},
+    {"type":"range","id":"columns","label":"Produtos visíveis no computador","min":2,"max":6,"step":1,"default":4},
+    {"type":"select","id":"mobile_columns","label":"Produtos visíveis no celular","options":[{"value":"1","label":"1"},{"value":"1.5","label":"1,5"},{"value":"2","label":"2"}],"default":"1.5"},
+    {"type":"range","id":"spacing","label":"Espaçamento no computador (0 usa o tema)","min":0,"max":120,"step":4,"default":0},
+    {"type":"range","id":"mobile_spacing","label":"Espaçamento no celular (0 usa o tema)","min":0,"max":80,"step":4,"default":0},
+    {"type":"color","id":"background","label":"Fundo (vazio usa o tema)"},
+    {"type":"color","id":"text_color","label":"Texto (vazio usa o tema)"}
+  ],
+  "presets":[{"name":"Visto recentemente"}]
+}
+{% endschema %}
